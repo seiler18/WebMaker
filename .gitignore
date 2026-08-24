@@ -1,0 +1,30 @@
+# .gitignore de WebMaker (el taller).
+#
+# OJO: no confundir con plantilla/dot-gitignore, que es el .gitignore que
+# hereda cada sitio generado. Este es para el repositorio de aquí.
+
+# La plantilla no se instala nunca en su sitio: se copia a un proyecto y allí
+# se hace el npm install. Si aparece un node_modules aquí, es que alguien
+# probó en el lugar equivocado.
+node_modules/
+dist/
+.vite/
+package-lock.json
+
+# Pruebas de materialización de la plantilla. Van al scratchpad, no aquí.
+_prueba*/
+_tmp*/
+
+# Sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editores
+.vscode/
+.idea/
+*.swp
+
+# Logs
+npm-debug.log*
+*.log
