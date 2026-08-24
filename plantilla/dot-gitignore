@@ -1,0 +1,25 @@
+# Al materializar la plantilla, este archivo se renombra a .gitignore
+# (ver plantilla/_MARCADORES.md).
+
+node_modules/
+dist/
+.vite/
+
+# Material de trabajo que NO se publica: másteres de imágenes antes de pasar
+# a WebP, documentos fuente del cliente, pruebas. Si algo de aquí tiene que
+# llegar al sitio, muévelo a assets/ y decláralo en scripts/copy-assets.js.
+tools/
+
+# Sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editores
+.vscode/
+.idea/
+*.swp
+
+# Logs
+npm-debug.log*
+*.log

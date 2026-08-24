@@ -1,0 +1,600 @@
+/* ============================================================
+   COMPONENTES — hero, botones, tarjetas, bloques, formulario, pie, modal
+
+   Todo lo que se repite en más de una sección. Si un estilo solo lo usa una
+   sección concreta, tiene más sentido dejarlo junto a ella.
+   ============================================================ */
+
+/* ----------------------- ANIMACIÓN DE ENTRADA -----------------------
+   Estado inicial de [data-anim]; src/lib/reveal.js añade .anim-visible al
+   entrar en pantalla. Si el JS fallara, el contenido quedaría invisible, así
+   que reveal.js marca todo como visible también cuando no puede observar. */
+[data-anim] {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.6s ease-out, transform 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+[data-anim].anim-visible { opacity: 1; transform: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  [data-anim] { opacity: 1; transform: none; }
+}
+
+/* ----------------------- PORTADA ----------------------- */
+.hero {
+  position: relative;
+  /* `isolate` contiene las capas de z-index negativo del fondo. Sin él se
+     colarían por debajo del fondo de la página y no se verían. */
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: min(88vh, 780px);
+  padding: 4rem 1.5rem 5rem;
+  text-align: center;
+  overflow: hidden;
+}
+
+.hero-fondo {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(680px circle at 22% 25%, var(--brillo), transparent 60%),
+    radial-gradient(520px circle at 80% 70%, var(--brillo-acento), transparent 55%);
+  /* Rejilla técnica muy tenue. Da textura sin competir con el texto. */
+  background-color: transparent;
+}
+.hero-fondo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--borde) 1px, transparent 1px),
+    linear-gradient(90deg, var(--borde) 1px, transparent 1px);
+  background-size: 54px 54px;
+  mask-image: radial-gradient(circle at 50% 40%, #000 30%, transparent 75%);
+  -webkit-mask-image: radial-gradient(circle at 50% 40%, #000 30%, transparent 75%);
+}
+
+.hero-contenido { max-width: 900px; }
+
+.hero-antetitulo {
+  margin: 0 0 1rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--acento);
+}
+.hero-titulo {
+  margin: 0;
+  font-size: clamp(2.4rem, 7vw, 4.4rem);
+  background: var(--degradado-texto);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.hero-lema {
+  margin: 0.6rem 0 0;
+  font-size: clamp(1rem, 2.4vw, 1.35rem);
+  font-weight: 700;
+  color: var(--primario-claro);
+}
+.hero-bajada {
+  max-width: 640px;
+  margin: 1.5rem auto 0;
+  font-size: 1.05rem;
+  color: var(--texto);
+}
+
+.hero-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.85rem;
+  margin-top: 2.2rem;
+}
+
+.hero-cinta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem 2.5rem;
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--borde);
+}
+.hero-cinta-dato {
+  display: block;
+  font-family: var(--fuente-titulos);
+  font-size: 1.9rem;
+  font-weight: 800;
+  color: var(--acento);
+  line-height: 1.1;
+}
+.hero-cinta-pie {
+  font-size: 0.8rem;
+  color: var(--texto-tenue);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* Indicador de «hay más abajo» */
+.hero-scroll {
+  position: absolute;
+  bottom: 1.6rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--borde);
+  border-radius: 50%;
+  color: var(--texto-tenue);
+  animation: hero-latido 2.4s ease-in-out infinite;
+}
+.hero-scroll:hover { color: var(--acento); border-color: var(--borde-vivo); }
+@keyframes hero-latido {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50%      { transform: translateX(-50%) translateY(6px); }
+}
+
+/* ----------------------- BOTONES ----------------------- */
+.btn,
+.hero-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 999px;
+  font-family: var(--fuente-texto);
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease,
+              background-color 0.25s ease, color 0.25s ease;
+}
+.btn.primario,
+.hero-btn.primario {
+  background: var(--degradado);
+  color: #fff;
+}
+.btn.primario:hover,
+.hero-btn.primario:hover {
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 0 24px var(--brillo-acento);
+}
+.btn.fantasma,
+.hero-btn.fantasma {
+  background: rgba(13, 17, 28, 0.6);
+  border: 1px solid var(--borde-vivo);
+  color: var(--acento);
+}
+.btn.fantasma:hover,
+.hero-btn.fantasma:hover {
+  background: var(--surface-2);
+  transform: translateY(-2px);
+}
+.btn:disabled {
+  opacity: 0.55;
+  cursor: progress;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Enlace-botón discreto, para dentro de una tarjeta */
+.btn-linea {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+.btn-linea i { font-size: 0.75rem; transition: transform 0.25s ease; }
+.btn-linea:hover i { transform: translateX(3px); }
+
+.btn-descarga {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--borde-vivo);
+  border-radius: var(--radio-sm);
+  background: rgba(13, 17, 28, 0.6);
+  color: var(--texto);
+  font-size: 0.82rem;
+  font-weight: 700;
+  transition: border-color 0.25s, box-shadow 0.25s, color 0.25s, transform 0.25s;
+}
+.btn-descarga:hover {
+  color: var(--texto-fuerte);
+  border-color: var(--acento);
+  box-shadow: 0 0 18px var(--brillo-acento);
+  transform: translateY(-2px);
+}
+
+/* ----------------------- BLOQUE DE TEXTO ----------------------- */
+.bloque-dos-columnas {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  align-items: center;
+  gap: 3rem;
+}
+/* Invierte el orden VISUAL sin tocar el del HTML: quien navega con teclado o
+   lector de pantalla recorre siempre texto → imagen. */
+.bloque-dos-columnas[data-lado="izquierda"] .bloque-figura { order: -1; }
+
+.bloque-texto { font-size: 1.05rem; }
+.bloque-texto.centrado {
+  max-width: var(--ancho-texto);
+  margin: 0 auto;
+  text-align: center;
+}
+
+.bloque-figura { margin: 0; }
+.bloque-figura img {
+  width: 100%;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  box-shadow: var(--sombra);
+}
+.bloque-figura figcaption {
+  margin-top: 0.6rem;
+  font-size: 0.82rem;
+  color: var(--texto-tenue);
+  text-align: center;
+}
+
+/* Fila de destacados (misión, visión, valores…) */
+.destacados {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.25rem;
+  margin-top: 2.5rem;
+}
+.destacado {
+  display: flex;
+  gap: 0.9rem;
+  padding: 1.25rem;
+  background: var(--surface);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+}
+.destacado i {
+  flex-shrink: 0;
+  font-size: 1.4rem;
+  color: var(--acento);
+  filter: drop-shadow(0 0 10px var(--brillo-acento));
+}
+.destacado strong { display: block; margin-bottom: 0.25rem; }
+.destacado p { margin: 0; font-size: 0.92rem; color: var(--texto-tenue); }
+
+/* ----------------------- REJILLA DE TARJETAS -----------------------
+   `auto-fill` + `minmax`: tantas columnas como caben y una sola en móvil,
+   sin una media query propia. Es la razón por la que aquí no hay carrusel:
+   nada que igualar de alto, nada que tape los botones. */
+.rejilla {
+  display: grid;
+  gap: 1.25rem;
+}
+.rejilla[data-densidad="amplia"]   { grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); }
+.rejilla[data-densidad="compacta"] { grid-template-columns: repeat(auto-fill, minmax(215px, 1fr)); }
+
+.tarjeta {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+.tarjeta:hover {
+  transform: translateY(-5px);
+  border-color: var(--borde-vivo);
+  box-shadow: 0 14px 40px var(--brillo);
+}
+/* El filtro usa el atributo `hidden`; sin esto el `display: flex` de arriba
+   ganaría en especificidad y la tarjeta oculta seguiría viéndose. */
+.tarjeta[hidden] { display: none; }
+
+/* Alto fijo de portada para que la rejilla quede alineada aunque las
+   imágenes lleguen en proporciones distintas. */
+.tarjeta-portada { height: 168px; background: var(--surface-2); overflow: hidden; }
+.tarjeta-portada img { width: 100%; height: 100%; object-fit: cover; }
+
+.tarjeta-icono {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  margin: 1.25rem 1.25rem 0;
+  border-radius: var(--radio-sm);
+  background: rgba(37, 99, 235, 0.14);
+  border: 1px solid var(--borde);
+}
+.tarjeta-icono i {
+  font-size: 1.4rem;
+  color: var(--acento);
+  filter: drop-shadow(0 0 10px var(--brillo-acento));
+}
+
+.tarjeta-cuerpo {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 1.25rem;
+}
+.tarjeta-titulo { margin: 0 0 0.5rem; font-size: 1.08rem; }
+.tarjeta-texto { margin: 0; font-size: 0.94rem; color: var(--texto-tenue); }
+/* `margin-top: auto` empuja la acción al fondo → todos los enlaces de la
+   fila quedan a la misma altura aunque los textos ocupen 1 o 3 líneas. */
+.tarjeta-accion { margin: auto 0 0; padding-top: 1rem; }
+
+.rejilla-vacia { margin-top: 2rem; text-align: center; color: var(--texto-tenue); }
+
+/* ----------------------- FILTROS ----------------------- */
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+}
+.filtro {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--borde);
+  border-radius: 999px;
+  background: rgba(17, 24, 39, 0.6);
+  color: var(--texto-tenue);
+  font-family: inherit;
+  font-size: 0.86rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.25s, border-color 0.25s, background 0.25s, box-shadow 0.25s;
+}
+.filtro:hover { color: var(--texto-fuerte); border-color: var(--borde-vivo); }
+.filtro.is-active {
+  color: var(--texto-fuerte);
+  background: rgba(37, 99, 235, 0.22);
+  border-color: var(--acento);
+  box-shadow: 0 0 16px var(--brillo);
+}
+.filtro-cuenta {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.5rem;
+  height: 1.5rem;
+  padding: 0 0.35rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+.filtro.is-active .filtro-cuenta { background: var(--degradado); color: #fff; }
+
+/* ----------------------- CONTACTO ----------------------- */
+.contacto-columnas {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 2.5rem;
+  align-items: start;
+}
+
+.contacto-form {
+  padding: 1.75rem;
+  background: var(--surface);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+}
+
+/* auto-fit + minmax: dos columnas cuando caben y una sola cuando no. */
+.contacto-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0 1rem;
+}
+.contacto-grid .campo-ancho { grid-column: 1 / -1; }
+
+.campo { margin-bottom: 1rem; }
+.campo label {
+  display: block;
+  margin-bottom: 0.3rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--texto-tenue);
+}
+.campo input,
+.campo select,
+.campo textarea {
+  width: 100%;
+  padding: 0.65rem 0.8rem;
+  background: var(--surface-2);
+  color: var(--texto);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-sm);
+  font-family: inherit;
+  font-size: 0.95rem;
+}
+.campo textarea { resize: vertical; min-height: 110px; }
+.campo input:focus,
+.campo select:focus,
+.campo textarea:focus {
+  outline: none;
+  border-color: var(--acento);
+  box-shadow: 0 0 0 3px var(--brillo);
+}
+.campo ::placeholder { color: rgba(148, 163, 184, 0.7); }
+
+/* La trampa para bots NO se oculta con display:none: algunos bots ignoran
+   los campos ocultos así. Del teclado y del lector de pantalla ya se
+   encargan tabindex y aria-hidden en el HTML. */
+.campo-trampa {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.contacto-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+.contacto-acciones .btn { flex: 1 1 200px; }
+
+/* El aviso arranca oculto pero ocupando su sitio: así al aparecer no empuja
+   el pie hacia abajo (y con él el scroll-spy). */
+.contacto-aviso {
+  min-height: 1.4em;
+  margin: 1rem 0 0;
+  font-size: 0.9rem;
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+.contacto-aviso.visible { opacity: 1; }
+.contacto-aviso.ok    { color: var(--ok); }
+.contacto-aviso.malo  { color: var(--error); }
+.contacto-aviso.nota  { color: var(--texto-tenue); }
+
+.contacto-datos {
+  padding: 1.75rem;
+  background: var(--surface-2);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+}
+.contacto-datos h3 { font-size: 1.05rem; }
+.canales { display: flex; flex-direction: column; gap: 1.1rem; }
+.canales li { display: flex; gap: 0.8rem; align-items: flex-start; }
+.canales i {
+  flex-shrink: 0;
+  width: 1.4rem;
+  margin-top: 0.2rem;
+  color: var(--acento);
+  text-align: center;
+}
+.canal-etiqueta {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--texto-tenue);
+}
+
+/* ----------------------- PIE ----------------------- */
+.pie {
+  margin-top: 4rem;
+  padding-top: 3rem;
+  border-top: 1px solid var(--borde);
+  background: rgba(10, 14, 26, 0.5);
+}
+.pie-inner {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr;
+  gap: 2.5rem;
+  max-width: var(--ancho-max);
+  margin: 0 auto;
+  padding: 0 1.5rem 2.5rem;
+}
+.pie h2 {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--texto-tenue);
+}
+.pie-nombre {
+  font-family: var(--fuente-titulos);
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--texto-fuerte);
+}
+.pie-lema { margin: 0.3rem 0 0; color: var(--texto-tenue); font-size: 0.92rem; }
+.pie-dato { margin: 0.8rem 0 0; font-size: 0.92rem; }
+
+.pie-nav ul { display: flex; flex-direction: column; gap: 0.4rem; }
+.pie-nav a { color: var(--texto-tenue); font-size: 0.92rem; }
+.pie-nav a:hover { color: var(--acento); }
+
+.pie-redes-lista { display: flex; flex-direction: column; gap: 0.5rem; }
+.pie-redes-lista a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--texto-tenue);
+  font-size: 0.92rem;
+}
+.pie-redes-lista a:hover { color: var(--acento); }
+
+.pie-legal {
+  margin: 0;
+  padding: 1.25rem 1.5rem;
+  border-top: 1px solid var(--borde);
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--texto-tenue);
+}
+
+/* ----------------------- MODAL -----------------------
+   <dialog> nativo: el navegador da el foco atrapado, el cierre con Escape y
+   el fondo inerte. src/lib/modal.js solo lo abre y lo mueve a <body>. */
+dialog.modal {
+  max-width: min(720px, calc(100vw - 2rem));
+  max-height: calc(100vh - 4rem);
+  padding: 0;
+  border: none;
+  background: transparent;
+  overflow: visible;
+}
+dialog.modal::backdrop {
+  background: rgba(3, 6, 15, 0.72);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+.modal-caja {
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 4rem);
+  background: var(--surface);
+  border: 1px solid var(--borde-vivo);
+  border-radius: var(--radio);
+  box-shadow: var(--sombra);
+  overflow: hidden;
+}
+.modal-cabecera,
+.modal-pie {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--borde);
+}
+.modal-pie { border-bottom: none; border-top: 1px solid var(--borde); justify-content: flex-end; }
+.modal-cabecera h2 { margin: 0; font-size: 1.1rem; }
+.modal-cuerpo { padding: 1.25rem; overflow-y: auto; }
+.modal-cerrar {
+  margin-left: auto;
+  width: 34px;
+  height: 34px;
+  background: none;
+  border: 1px solid var(--borde);
+  border-radius: 50%;
+  color: var(--texto-tenue);
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.modal-cerrar:hover { color: var(--texto-fuerte); border-color: var(--borde-vivo); }

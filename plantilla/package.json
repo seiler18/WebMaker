@@ -1,0 +1,18 @@
+{
+  "name": "{{SLUG}}",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "check": "node scripts/check-integrity.js",
+    "build": "npm run check && vite build && node scripts/copy-assets.js",
+    "preview": "vite preview"
+  },
+  "engines": {
+    "node": ">=20.19.0"
+  },
+  "devDependencies": {
+    "vite": "^8.0.16"
+  }
+}

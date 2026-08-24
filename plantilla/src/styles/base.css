@@ -1,0 +1,138 @@
+/* ============================================================
+   BASE — reinicio ligero y tipografía
+
+   No es un reset completo: solo lo que hace falta para que el resto del CSS
+   parta de un terreno predecible sin pelear con los estilos del navegador.
+   ============================================================ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  /* El salto suave hace que un enlace de ancla se lea como un movimiento y
+     no como un teletransporte. Se anula solo para quien pide menos
+     movimiento, al final de este archivo. */
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--fuente-texto);
+  font-size: 1rem;
+  line-height: 1.65;
+  color: var(--texto);
+  background-color: var(--bg);
+  /* Dos halos muy tenues rompen el plano del fondo sin distraer.
+     `fixed` para que no se muevan con el scroll: si se mueven, se notan. */
+  background-image:
+    radial-gradient(900px circle at 15% -10%, var(--brillo), transparent 45%),
+    radial-gradient(700px circle at 100% 0%, var(--brillo-acento), transparent 40%);
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ----------------------- TIPOGRAFÍA ----------------------- */
+h1, h2, h3, h4, h5, h6 {
+  margin: 0 0 0.6em;
+  font-family: var(--fuente-titulos);
+  font-weight: 800;
+  line-height: 1.2;
+  color: var(--texto-fuerte);
+  letter-spacing: 0.01em;
+}
+
+p { margin: 0 0 1em; }
+p:last-child { margin-bottom: 0; }
+
+strong, b { color: var(--texto-fuerte); font-weight: 700; }
+
+a {
+  color: var(--acento);
+  text-decoration: none;
+  transition: color 0.25s ease;
+}
+a:hover { color: var(--primario-claro); }
+
+img, svg, video {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ----------------------- LISTAS ----------------------- */
+/* Las listas de CONTENIDO llevan viñeta propia. Las de ESTRUCTURA (menús,
+   filtros, rejillas) no deben heredarla: en el proyecto original esa viñeta
+   se colaba en el menú y dejaba una flechita flotando sobre cada enlace.
+   Por eso el marcador se pone en `.prosa ul li` y no en `ul li` a secas. */
+ul, ol { margin: 0 0 1em; padding-left: 1.4em; }
+
+nav ul,
+.rejilla,
+.filtros,
+.canales,
+.destacados,
+.hero-cinta {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.prosa ul { list-style: none; padding-left: 0; }
+.prosa ul li {
+  position: relative;
+  padding-left: 1.6em;
+  margin-bottom: 0.4em;
+}
+.prosa ul li::before {
+  content: "▹";
+  position: absolute;
+  left: 0;
+  color: var(--acento);
+  font-weight: 700;
+}
+
+/* ----------------------- FOCO VISIBLE -----------------------
+   Nunca `outline: none` sin sustituto: quien navega con teclado se queda sin
+   saber dónde está. `:focus-visible` lo enseña solo cuando hace falta, así
+   que el ratón no ve un contorno al hacer clic. */
+:focus-visible {
+  outline: 2px solid var(--acento);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* ----------------------- SALTAR AL CONTENIDO -----------------------
+   Primer elemento tabulable de la página. Fuera de pantalla hasta que
+   recibe el foco. */
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 1rem;
+  z-index: 999;
+  padding: 0.7rem 1.2rem;
+  background: var(--primario);
+  color: #fff;
+  border-radius: 0 0 var(--radio-sm) var(--radio-sm);
+  font-weight: 700;
+  transition: top 0.2s ease;
+}
+.skip-link:focus { top: 0; color: #fff; }
+
+/* ----------------------- MENOS MOVIMIENTO -----------------------
+   Respeta la preferencia del sistema. No se anula el color ni la opacidad
+   final: solo el movimiento. */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

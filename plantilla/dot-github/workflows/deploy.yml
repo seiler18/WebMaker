@@ -1,0 +1,51 @@
+# Al materializar la plantilla, la carpeta dot-github/ se renombra a .github/
+# (ver plantilla/_MARCADORES.md).
+#
+# Publica el sitio en GitHub Pages en cada push a main.
+#
+# `npm run build` incluye `npm run check`, así que un enlace roto, un
+# marcador {{…}} sin rellenar o un `base` mal puesto hacen FALLAR el deploy
+# en vez de llegar a producción. Es deliberado: mejor un workflow rojo que un
+# sitio publicado sin estilos.
+
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  # Permite relanzarlo a mano desde la pestaña Actions sin hacer un commit.
+  workflow_dispatch:
+
+# Si se empujan dos commits seguidos, se cancela el deploy anterior: no tiene
+# sentido publicar una versión que ya quedó atrás.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Preparar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      # `npm ci` y no `npm install`: instala exactamente lo del
+      # package-lock.json, así el build del runner es el mismo que el local.
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Construir
+        run: npm run build
+
+      - name: Publicar en gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist

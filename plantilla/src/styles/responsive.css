@@ -1,0 +1,174 @@
+/* ============================================================
+   RESPONSIVE
+
+   DEBE IMPORTARSE EL ÚLTIMO (ver el orden en src/main.js) para que sus
+   overrides ganen por orden de cascada. Así no hace falta ni un !important.
+   Si lo subes de sitio, empezarás a necesitarlos.
+
+   Corte principal en 991.98px: por debajo de ese ancho no caben a la vez una
+   columna lateral y contenido legible, así que cada armazón cambia de forma:
+
+     'topbar'   → los enlaces se esconden en un cajón desplegable
+     'sidebar'  → la columna se convierte en barra inferior de iconos
+   ============================================================ */
+
+@media (max-width: 991.98px) {
+
+  /* ================= ARMAZÓN 'topbar': cajón desplegable ================= */
+  .menu-boton { display: block; }
+
+  .topbar-nav {
+    position: fixed;
+    top: var(--topbar-h);
+    left: 0;
+    right: 0;
+    z-index: var(--z-menu-movil);
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    max-height: calc(100vh - var(--topbar-h));
+    padding: 0.75rem 1rem 1.25rem;
+    background: rgba(10, 14, 26, 0.97);
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--borde);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5);
+    overflow-y: auto;
+
+    /* Cerrado: plegado hacia arriba y sin poder recibir clics.
+       Se usa scaleY + opacity en vez de `display:none` para que la apertura
+       se pueda animar. `visibility` es lo que lo saca del tabulador: con
+       solo opacity:0 seguiría siendo enfocable. */
+    transform-origin: top;
+    transform: scaleY(0.85);
+    opacity: 0;
+    visibility: hidden;
+    transition: transform 0.25s ease, opacity 0.25s ease, visibility 0.25s;
+  }
+  .topbar-nav.abierto {
+    transform: none;
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .topbar-nav > ul { flex-direction: column; align-items: stretch; gap: 0.15rem; }
+  .topbar-nav .nav-link { padding: 0.85rem 1rem; font-size: 1rem; }
+  /* En el cajón el subrayado no tiene sentido: los enlaces son filas. */
+  .topbar .nav-link::after { display: none; }
+  .topbar-nav .nav-link.is-active {
+    box-shadow: inset 3px 0 0 var(--acento);
+  }
+
+  .topbar-nav .topbar-extras {
+    flex-direction: column;
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--borde);
+  }
+
+  /* ============ ARMAZÓN 'sidebar': barra inferior de iconos ============ */
+  body[data-armazon="sidebar"] .app-main {
+    margin-left: 0;
+    /* Hueco para que la barra inferior no tape el final del pie. */
+    padding-bottom: var(--barra-movil-h);
+  }
+  body[data-armazon="sidebar"] .topbar { left: 0; }
+
+  /* La marca de la barra superior aparece: la cabecera de la sidebar se
+     oculta abajo y sin esto el logo no se vería en el celular. */
+  body[data-armazon="sidebar"] .marca-movil { display: flex; }
+  body[data-armazon="sidebar"] .marca-movil .marca-lema { display: none; }
+
+  .sidenav {
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    flex-direction: row;
+    width: 100%;
+    height: var(--barra-movil-h);
+    padding: 0;
+    border-right: none;
+    border-top: 1px solid var(--borde);
+    box-shadow: 0 -6px 26px rgba(0, 0, 0, 0.55);
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+  /* Marca y acciones no caben en una barra de 62px: en móvil viven arriba. */
+  .sidenav-brand,
+  .sidenav-actions { display: none; }
+
+  .sidenav-nav { flex-direction: row; gap: 0; height: 100%; width: 100%; }
+  .sidenav-nav li { flex: 1 1 0; min-width: 62px; }
+
+  .sidenav .nav-link {
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.18rem;
+    height: 100%;
+    padding: 0.3rem 0.35rem;
+    border-radius: 0;
+    font-size: 0.62rem;
+    text-align: center;
+    line-height: 1.15;
+  }
+  .sidenav .nav-link i { font-size: 1.05rem; }
+
+  /* El acento pasa de barra lateral a subrayado superior */
+  .sidenav .nav-link::before {
+    top: 0;
+    left: 50%;
+    width: 58%;
+    height: 3px;
+    border-radius: 0 0 3px 3px;
+    transform: translateX(-50%) scaleX(0);
+  }
+  .sidenav .nav-link.is-active::before { transform: translateX(-50%) scaleX(1); }
+  .sidenav .nav-link.is-active { background: rgba(37, 99, 235, 0.18); }
+
+  /* Etiquetas: la larga se va, la corta aparece */
+  body[data-armazon="sidebar"] .sidenav .nav-largo { display: none; }
+  body[data-armazon="sidebar"] .sidenav .nav-corto { display: block; }
+}
+
+/* --- Dos columnas → una --- */
+@media (max-width: 900px) {
+  .bloque-dos-columnas { grid-template-columns: 1fr; gap: 2rem; }
+  /* La imagen sube: leer el texto después de una foto grande en vertical
+     obliga a hacer scroll a ciegas. */
+  .bloque-dos-columnas .bloque-figura { order: -1; }
+
+  .contacto-columnas { grid-template-columns: 1fr; gap: 1.5rem; }
+  .pie-inner { grid-template-columns: 1fr 1fr; }
+}
+
+/* --- Ajustes de contenido en pantallas pequeñas --- */
+@media (max-width: 767.98px) {
+  .topbar-inner { padding: 0 1rem; }
+  .marca-lema { display: none; }
+
+  .hero {
+    min-height: 78vh;
+    padding: 3rem 1.25rem 4.5rem;
+  }
+  .hero-bajada { font-size: 0.98rem; }
+  /* En una pantalla corta la flecha cae encima de los botones. */
+  .hero-scroll { display: none; }
+  .hero-acciones { flex-direction: column; align-items: stretch; }
+  .hero-cinta { gap: 1.25rem; margin-top: 2rem; padding-top: 1.5rem; }
+
+  .section { padding: 2.5rem 0; }
+  .section + .section { padding-top: 1.5rem; }
+  .section-inner { padding: 0 1rem; }
+  .section-divider { margin-bottom: 2rem; padding: 0 1rem; }
+  .section-head { margin-bottom: 1.8rem; }
+
+  .contacto-form,
+  .contacto-datos { padding: 1.25rem 1rem; }
+  .contacto-acciones .btn { flex: 1 1 100%; }
+
+  .pie-inner { grid-template-columns: 1fr; gap: 1.75rem; padding-bottom: 2rem; }
+
+  .modal-caja { max-height: calc(100vh - 2rem); }
+  dialog.modal { max-height: calc(100vh - 2rem); }
+}

@@ -1,0 +1,81 @@
+/* ============================================================
+   TOKENS — la paleta y las medidas del sitio, en un solo sitio
+
+   REGLA DEL PROYECTO: ningún color literal fuera de este archivo. Si
+   necesitas un tono que no está, añádelo aquí como token y úsalo por nombre.
+   En cuanto aparece un `#1a2b3c` suelto en un componente, cambiar la
+   identidad del sitio pasa de editar diez líneas a buscar por todo el CSS.
+
+   Para cambiar de identidad visual completa, sustituye el bloque de color de
+   abajo por una de las paletas de WebMaker/referencia/paletas.md. Las
+   medidas y los nombres no cambian, así que nada más se rompe.
+   ============================================================ */
+
+:root {
+  /* ----- Color: fondos ----- */
+  --bg:            #0a0e1a;   /* fondo general */
+  --bg-2:          #0d1117;   /* fondo alterno, para alternar secciones */
+  --surface:       #111827;   /* tarjetas y paneles */
+  --surface-2:     #0f172a;   /* paneles hundidos, campos de formulario */
+
+  /* ----- Color: marca ----- */
+  --primario:      #2563eb;
+  --primario-claro:#60a5fa;
+  --acento:        #22d3ee;
+
+  /* ----- Color: texto ----- */
+  --texto:         #e5e7eb;
+  --texto-tenue:   #94a3b8;
+  --texto-fuerte:  #ffffff;
+
+  /* ----- Color: bordes y brillos ----- */
+  --borde:         rgba(255, 255, 255, 0.08);
+  --borde-vivo:    rgba(34, 211, 238, 0.45);
+  --brillo:        rgba(37, 99, 235, 0.25);
+  --brillo-acento: rgba(34, 211, 238, 0.45);
+
+  /* ----- Color: estados ----- */
+  --ok:            #34d399;
+  --error:         #f87171;
+
+  /* ----- Degradados ----- */
+  --degradado:      linear-gradient(135deg, var(--primario) 0%, var(--acento) 100%);
+  --degradado-texto:linear-gradient(135deg, var(--primario-claro) 0%, var(--acento) 100%);
+
+  /* ----- Tipografía -----
+     Dos familias como máximo: una para títulos y otra para texto. Tres
+     empiezan a leerse como un collage. Si solo usas una, deja las dos
+     variables con el mismo valor. */
+  --fuente-titulos: 'Raleway', system-ui, sans-serif;
+  --fuente-texto:   'Raleway', system-ui, sans-serif;
+
+  /* ----- Formas ----- */
+  --radio:         16px;
+  --radio-sm:      10px;
+
+  /* ----- Medidas del armazón -----
+     Son tokens y no números sueltos porque las leen varios archivos: el
+     margen del contenido, la posición de la barra fija y el hueco que se
+     reserva al pie en móvil tienen que cuadrar entre sí. */
+  --sidebar-w:     250px;
+  --topbar-h:      64px;
+  --barra-movil-h: 62px;
+
+  /* Ancho de lectura del contenido. Más de ~1180px y las líneas de texto se
+     hacen incómodamente largas en un monitor ancho. */
+  --ancho-max:     1180px;
+  --ancho-texto:   72ch;
+
+  /* ----- Sombras ----- */
+  --sombra:        0 12px 40px rgba(0, 0, 0, 0.45);
+  --sombra-suave:  0 6px 20px rgba(0, 0, 0, 0.30);
+
+  /* ----- Capas -----
+     Escala explícita para no ir adivinando. El modal usa <dialog>, que el
+     navegador pinta en su propia capa por encima de todo, así que no
+     necesita número. */
+  --z-contenido:   1;
+  --z-barra:       100;
+  --z-sidebar:     110;
+  --z-menu-movil:  120;
+}

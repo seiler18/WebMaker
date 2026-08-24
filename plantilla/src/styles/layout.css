@@ -1,0 +1,366 @@
+/* ============================================================
+   ARMAZÓN Y SECCIONES
+
+   Dos maquetas de navegación, elegidas con `data-armazon` en el <body>
+   (lo pone src/main.js a partir de site.armazon):
+
+     body[data-armazon="topbar"]
+       #app
+       ├── .skip-link
+       ├── header.topbar          (fija arriba, todo el ancho)
+       └── .app-main
+           ├── main#contenido
+           │   └── section.section × N
+           └── footer.pie
+
+     body[data-armazon="sidebar"]
+       #app
+       ├── .skip-link
+       ├── aside.sidenav          (fija izquierda; barra inferior en móvil)
+       ├── header.topbar-minima   (fija arriba, arranca tras la sidebar)
+       └── .app-main              (desplazada por margin-left)
+           ├── main#contenido
+           └── footer.pie
+   ============================================================ */
+
+/* ----------------------- CONTENEDOR PRINCIPAL ----------------------- */
+.app-main {
+  min-height: 100vh;
+  padding-top: var(--topbar-h);
+}
+
+body[data-armazon="sidebar"] .app-main {
+  margin-left: var(--sidebar-w);
+}
+
+/* ----------------------- BARRA SUPERIOR ----------------------- */
+.topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: var(--z-barra);
+  min-height: var(--topbar-h);
+  background: rgba(10, 14, 26, 0.82);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--borde);
+}
+
+/* En el armazón de columna, la barra arranca a la derecha de la sidebar
+   para no taparla. */
+body[data-armazon="sidebar"] .topbar {
+  left: var(--sidebar-w);
+}
+
+.topbar-inner {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  max-width: var(--ancho-max);
+  height: var(--topbar-h);
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.topbar-nav {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-left: auto;
+}
+.topbar-nav > ul {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+.topbar-extras { display: flex; gap: 0.5rem; }
+
+/* ----------------------- MARCA ----------------------- */
+.marca {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  min-width: 0;
+  color: var(--texto);
+}
+.marca:hover { color: var(--texto-fuerte); }
+
+.marca-logo,
+.marca-monograma {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.marca-monograma {
+  display: grid;
+  place-items: center;
+  background: var(--degradado);
+  color: #fff;
+  font-family: var(--fuente-titulos);
+  font-weight: 800;
+  font-size: 0.95rem;
+  box-shadow: 0 0 18px var(--brillo-acento);
+}
+.marca-logo {
+  border: 2px solid var(--borde-vivo);
+  box-shadow: 0 0 14px var(--brillo-acento);
+}
+
+.marca-texto { display: flex; flex-direction: column; min-width: 0; line-height: 1.2; }
+.marca-nombre {
+  font-family: var(--fuente-titulos);
+  font-weight: 800;
+  font-size: 0.98rem;
+  color: var(--texto-fuerte);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.marca-lema {
+  font-size: 0.72rem;
+  color: var(--texto-tenue);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ----------------------- ENLACES DE NAVEGACIÓN ----------------------- */
+.nav-link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 0.85rem;
+  border-radius: var(--radio-sm);
+  color: var(--texto-tenue);
+  font-weight: 600;
+  font-size: 0.92rem;
+  transition: color 0.25s ease, background-color 0.25s ease;
+}
+.nav-link i { font-size: 0.9rem; transition: color 0.25s ease; }
+.nav-link:hover { color: var(--texto-fuerte); background: rgba(255, 255, 255, 0.05); }
+.nav-link:hover i { color: var(--acento); }
+
+.nav-link.is-active { color: var(--texto-fuerte); background: rgba(37, 99, 235, 0.16); }
+.nav-link.is-active i {
+  color: var(--acento);
+  filter: drop-shadow(0 0 8px var(--brillo-acento));
+}
+
+/* La etiqueta corta solo se usa en la barra inferior de móvil */
+.nav-corto { display: none; }
+
+/* Acento del enlace activo. En la barra superior es un subrayado; en la
+   columna, una barra vertical a la izquierda (más abajo). */
+.topbar .nav-link::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 2px;
+  width: 60%;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--degradado);
+  transform: translateX(-50%) scaleX(0);
+  transition: transform 0.28s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.topbar .nav-link.is-active::after { transform: translateX(-50%) scaleX(1); }
+
+/* ----------------------- BOTÓN DE MENÚ (móvil) -----------------------
+   Oculto en escritorio; responsive.css lo enciende. Las tres barras se
+   dibujan con un pseudo-elemento cada una más el fondo del propio span. */
+.menu-boton {
+  display: none;
+  width: 44px;
+  height: 44px;
+  margin-left: auto;
+  padding: 0;
+  background: none;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-sm);
+  cursor: pointer;
+}
+.menu-boton-barras,
+.menu-boton-barras::before,
+.menu-boton-barras::after {
+  display: block;
+  width: 20px;
+  height: 2px;
+  margin: 0 auto;
+  background: var(--texto);
+  border-radius: 2px;
+  transition: transform 0.25s ease, opacity 0.2s ease;
+}
+.menu-boton-barras::before { content: ""; transform: translateY(-6px); }
+.menu-boton-barras::after  { content: ""; transform: translateY(4px); }
+
+/* Aspa cuando está abierto. `aria-expanded` es la fuente de verdad del
+   estado, así que el CSS lo lee de ahí en vez de una clase paralela. */
+.menu-boton[aria-expanded="true"] .menu-boton-barras { background: transparent; }
+.menu-boton[aria-expanded="true"] .menu-boton-barras::before { transform: rotate(45deg); }
+.menu-boton[aria-expanded="true"] .menu-boton-barras::after  { transform: rotate(-45deg); }
+
+/* ----------------------- COLUMNA LATERAL ----------------------- */
+.sidenav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: var(--z-sidebar);
+  display: flex;
+  flex-direction: column;
+  width: var(--sidebar-w);
+  height: 100vh;
+  padding: 1.4rem 1rem;
+  background: rgba(10, 14, 26, 0.82);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  border-right: 1px solid var(--borde);
+  box-shadow: 4px 0 30px rgba(0, 0, 0, 0.45);
+  overflow-y: auto;
+}
+
+.sidenav-brand {
+  padding: 0.2rem 0.4rem 1.2rem;
+  border-bottom: 1px solid var(--borde);
+  margin-bottom: 1.2rem;
+}
+
+.sidenav-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  /* empuja el bloque de acciones al fondo de la columna */
+  flex: 1 1 auto;
+}
+
+/* Barra de acento a la izquierda del enlace activo. Se anima con scaleY
+   para que el cambio de sección se sienta continuo y no un salto. */
+.sidenav .nav-link::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 3px;
+  height: 62%;
+  border-radius: 0 3px 3px 0;
+  background: var(--degradado);
+  transform: translateY(-50%) scaleY(0);
+  transition: transform 0.28s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.sidenav .nav-link.is-active::before { transform: translateY(-50%) scaleY(1); }
+
+.sidenav-actions { padding-top: 1rem; border-top: 1px solid var(--borde); }
+.sidenav-social {
+  display: flex;
+  justify-content: center;
+  gap: 0.35rem;
+  margin-top: 0.7rem;
+}
+.sidenav-social a {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  color: var(--texto-tenue);
+  border: 1px solid var(--borde);
+  transition: color 0.25s, border-color 0.25s, transform 0.25s;
+}
+.sidenav-social a:hover {
+  color: var(--acento);
+  border-color: var(--borde-vivo);
+  transform: translateY(-2px);
+}
+
+/* En el armazón de columna, la marca de la barra superior solo se ve en
+   móvil: en escritorio la cabecera de la sidebar ya la muestra. */
+body[data-armazon="sidebar"] .marca-movil { display: none; }
+
+/* ----------------------- SECCIONES -----------------------
+   `scroll-margin-top` evita que la barra fija tape el título al saltar a un
+   ancla. Sin él, el enlace lleva el título justo debajo de la barra. */
+.section {
+  scroll-margin-top: calc(var(--topbar-h) + 16px);
+  padding: 3.5rem 0;
+}
+.section + .section { padding-top: 2rem; }
+
+.section-inner {
+  width: 100%;
+  max-width: var(--ancho-max);
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+/* ----------------------- CABECERA DE SECCIÓN ----------------------- */
+.section-head {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+.section-eyebrow {
+  display: inline-block;
+  margin-bottom: 0.6rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--acento);
+}
+.section-title {
+  margin: 0;
+  font-size: clamp(1.9rem, 4vw, 2.8rem);
+  /* El degradado se recorta al texto. `-webkit-` sigue siendo necesario:
+     sin él, en WebKit el texto se ve transparente. */
+  background: var(--degradado-texto);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.section-rule {
+  width: 90px;
+  height: 3px;
+  margin: 1.1rem auto 0;
+  border-radius: 999px;
+  background: var(--degradado);
+  box-shadow: 0 0 14px var(--brillo-acento);
+}
+.section-subtitle {
+  max-width: 700px;
+  margin: 0.9rem auto 0;
+  color: var(--texto-tenue);
+  font-size: 1rem;
+}
+
+/* ----------------------- SEPARADOR DE ZONA -----------------------
+   Línea que se funde a los lados con un rombo en el centro. Marca el cambio
+   de sección sin un <hr> que corta a lo bruto. Lo pone seccion() en todas
+   las secciones menos la primera. */
+.section-divider {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  max-width: var(--ancho-max);
+  margin: 0 auto 3rem;
+  padding: 0 1.5rem;
+}
+.section-divider::before,
+.section-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+}
+.section-divider::before { background: linear-gradient(90deg, transparent, var(--borde-vivo)); }
+.section-divider::after  { background: linear-gradient(90deg, var(--borde-vivo), transparent); }
+.section-divider span {
+  flex: 0 0 auto;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  transform: rotate(45deg);
+  background: var(--degradado);
+  box-shadow: 0 0 12px var(--brillo-acento);
+}
