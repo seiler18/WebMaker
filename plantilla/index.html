@@ -3,7 +3,11 @@
 
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- `viewport-fit=cover` es lo que hace que `env(safe-area-inset-*)` deje de
+       valer cero en los teléfonos con notch. Sin él, la barra inferior de
+       navegación queda debajo de la raya del gesto y no se puede pulsar.
+       Lo aprovecha responsive.css; en el resto de teléfonos no cambia nada. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
   <title>{{NOMBRE}} | {{TITULO_SEO}}</title>
   <meta name="description" content="{{DESCRIPCION}}">

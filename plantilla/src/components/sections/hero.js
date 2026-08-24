@@ -26,7 +26,7 @@ export function renderHero() {
 
   const cinta = hero.cinta.length
     ? `
-      <ul class="hero-cinta" aria-label="En cifras">
+      <ul class="hero-cinta" aria-label="En cifras" data-anim="subir">
         ${hero.cinta
           .map(
             d => `
@@ -45,13 +45,25 @@ export function renderHero() {
     <header class="hero" id="inicio">
       <div class="hero-fondo" aria-hidden="true"></div>
 
-      <div class="hero-contenido">
-        ${hero.antetitulo ? `<p class="hero-antetitulo">${hero.antetitulo}</p>` : ''}
-        <h1 class="hero-titulo">${site.nombre}</h1>
-        ${site.lema ? `<p class="hero-lema">«${site.lema}»</p>` : ''}
-        <p class="hero-bajada">${hero.bajada}</p>
+      <!-- SECUENCIA DE ENTRADA DE LA PORTADA. El atributo data-anim-secuencia
+           escalona a los hijos 70ms cada uno (src/lib/reveal.js), y el orden
+           del HTML es el orden en el que se quiere que se lean: antetítulo →
+           nombre → lema → bajada → botones → cifras. Es lo mismo que se
+           leería sin animación, solo que la página lo va marcando. Los seis a
+           la vez —lo que había antes, sin animación ninguna en la portada—
+           obligan al visitante a decidir por dónde empieza.
 
-        <div class="hero-acciones">${botones}</div>
+           OJO: en este comentario no puede haber comillas invertidas. Está
+           DENTRO de un literal de plantilla, y una comilla invertida lo cierra
+           ahí mismo: el archivo deja de compilar con un error que señala la
+           línea siguiente y no dice nada del comentario. -->
+      <div class="hero-contenido" data-anim-secuencia>
+        ${hero.antetitulo ? `<p class="hero-antetitulo" data-anim="subir">${hero.antetitulo}</p>` : ''}
+        <h1 class="hero-titulo" data-anim="subir">${site.nombre}</h1>
+        ${site.lema ? `<p class="hero-lema" data-anim="subir">«${site.lema}»</p>` : ''}
+        <p class="hero-bajada" data-anim="subir">${hero.bajada}</p>
+
+        <div class="hero-acciones" data-anim="subir">${botones}</div>
         ${cinta}
       </div>
 

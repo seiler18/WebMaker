@@ -23,7 +23,7 @@ import { seccion } from '../seccion.js'
 export function renderBloque(b) {
   const destacados = b.destacados?.length
     ? `
-      <ul class="destacados">
+      <ul class="destacados" data-anim-secuencia>
         ${b.destacados
           .map(
             d => `
@@ -43,7 +43,7 @@ export function renderBloque(b) {
 
   const imagen = b.imagen
     ? `
-      <figure class="bloque-figura" data-anim="subir">
+      <figure class="bloque-figura" data-anim="escala">
         <img src="${b.imagen.src}" alt="${b.imagen.alt}" loading="lazy">
         ${b.imagen.pie ? `<figcaption>${b.imagen.pie}</figcaption>` : ''}
       </figure>
@@ -55,7 +55,7 @@ export function renderBloque(b) {
   // teclado recorre siempre texto → imagen, que es el orden que tiene sentido.
   const cuerpo = b.imagen
     ? `
-      <div class="bloque-dos-columnas" data-lado="${b.ladoImagen || 'derecha'}">
+      <div class="bloque-dos-columnas" data-lado="${b.ladoImagen || 'derecha'}" data-anim-secuencia>
         <div class="bloque-texto" data-anim="subir">${b.cuerpo}</div>
         ${imagen}
       </div>

@@ -21,6 +21,9 @@
        └── .app-main              (desplazada por margin-left)
            ├── main#contenido
            └── footer.pie
+
+   Como en components.css: los `:hover` van dentro de `@media (hover: hover)`
+   y las duraciones salen de los tokens.
    ============================================================ */
 
 /* ----------------------- CONTENEDOR PRINCIPAL ----------------------- */
@@ -89,7 +92,6 @@ body[data-armazon="sidebar"] .topbar {
   min-width: 0;
   color: var(--texto);
 }
-.marca:hover { color: var(--texto-fuerte); }
 
 .marca-logo,
 .marca-monograma {
@@ -106,7 +108,7 @@ body[data-armazon="sidebar"] .topbar {
   color: #fff;
   font-family: var(--fuente-titulos);
   font-weight: 800;
-  font-size: 0.95rem;
+  font-size: var(--txt-ui);
   box-shadow: 0 0 18px var(--brillo-acento);
 }
 .marca-logo {
@@ -114,18 +116,23 @@ body[data-armazon="sidebar"] .topbar {
   box-shadow: 0 0 14px var(--brillo-acento);
 }
 
-.marca-texto { display: flex; flex-direction: column; min-width: 0; line-height: 1.2; }
+.marca-texto {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: var(--interlinea-titulo);
+}
 .marca-nombre {
   font-family: var(--fuente-titulos);
   font-weight: 800;
-  font-size: 0.98rem;
+  font-size: var(--txt-cuerpo);
   color: var(--texto-fuerte);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .marca-lema {
-  font-size: 0.72rem;
+  font-size: var(--txt-micro);
   color: var(--texto-tenue);
   white-space: nowrap;
   overflow: hidden;
@@ -141,7 +148,10 @@ body[data-armazon="sidebar"] .topbar {
    conserva. */
 body[data-armazon="topbar"] .topbar .marca-lema { display: none; }
 
-/* ----------------------- ENLACES DE NAVEGACIÓN ----------------------- */
+/* ----------------------- ENLACES DE NAVEGACIÓN -----------------------
+   El menú va en --txt-menudo (13px) a propósito: es orientación, no lectura, y
+   cada punto que baja son unos 40px menos de barra ocupada, que es lo que
+   evita que el menú se parta en dos líneas con seis secciones (trampas 20). */
 .nav-link {
   position: relative;
   display: flex;
@@ -151,16 +161,20 @@ body[data-armazon="topbar"] .topbar .marca-lema { display: none; }
   border-radius: var(--radio-sm);
   color: var(--texto-tenue);
   font-weight: 600;
-  font-size: 0.88rem;
+  font-size: var(--txt-menudo);
   /* Que una etiqueta de dos palabras no se parta NUNCA por dentro. Sin esto,
      «Cómo trabajamos» rompía la barra en dos líneas antes incluso de que el
      menú llegara a desbordar. */
   white-space: nowrap;
-  transition: color 0.25s ease, background-color 0.25s ease;
+  transition:
+    color var(--rapido) var(--curva-suave),
+    background-color var(--rapido) var(--curva-suave);
 }
-.nav-link i { font-size: 0.88rem; flex-shrink: 0; transition: color 0.25s ease; }
-.nav-link:hover { color: var(--texto-fuerte); background: rgba(255, 255, 255, 0.05); }
-.nav-link:hover i { color: var(--acento); }
+.nav-link i {
+  font-size: var(--txt-menudo);
+  flex-shrink: 0;
+  transition: color var(--rapido) var(--curva-suave);
+}
 
 .nav-link.is-active { color: var(--texto-fuerte); background: var(--primario-tenue); }
 .nav-link.is-active i {
@@ -168,11 +182,19 @@ body[data-armazon="topbar"] .topbar .marca-lema { display: none; }
   filter: drop-shadow(0 0 8px var(--brillo-acento));
 }
 
+@media (hover: hover) {
+  .marca:hover { color: var(--texto-fuerte); }
+  .nav-link:hover { color: var(--texto-fuerte); background: rgba(255, 255, 255, 0.05); }
+  .nav-link:hover i { color: var(--acento); }
+}
+
 /* La etiqueta corta solo se usa en la barra inferior de móvil */
 .nav-corto { display: none; }
 
 /* Acento del enlace activo. En la barra superior es un subrayado; en la
-   columna, una barra vertical a la izquierda (más abajo). */
+   columna, una barra vertical a la izquierda (más abajo).
+   Se anima con scaleX y no con `width` para que lo mueva el compositor: un
+   subrayado que crece cambiando el ancho reflows la barra en cada fotograma. */
 .topbar .nav-link::after {
   content: "";
   position: absolute;
@@ -183,7 +205,7 @@ body[data-armazon="topbar"] .topbar .marca-lema { display: none; }
   border-radius: 2px;
   background: var(--degradado);
   transform: translateX(-50%) scaleX(0);
-  transition: transform 0.28s cubic-bezier(0.22, 0.61, 0.36, 1);
+  transition: transform var(--medio) var(--curva-salida);
 }
 .topbar .nav-link.is-active::after { transform: translateX(-50%) scaleX(1); }
 
@@ -192,14 +214,15 @@ body[data-armazon="topbar"] .topbar .marca-lema { display: none; }
    dibujan con un pseudo-elemento cada una más el fondo del propio span. */
 .menu-boton {
   display: none;
-  width: 44px;
-  height: 44px;
+  width: var(--toque-min);
+  height: var(--toque-min);
   margin-left: auto;
   padding: 0;
   background: none;
   border: 1px solid var(--borde);
   border-radius: var(--radio-sm);
   cursor: pointer;
+  touch-action: manipulation;
 }
 .menu-boton-barras,
 .menu-boton-barras::before,
@@ -210,7 +233,9 @@ body[data-armazon="topbar"] .topbar .marca-lema { display: none; }
   margin: 0 auto;
   background: var(--texto);
   border-radius: 2px;
-  transition: transform 0.25s ease, opacity 0.2s ease;
+  transition:
+    transform var(--medio) var(--curva-salida),
+    opacity var(--rapido) var(--curva-suave);
 }
 .menu-boton-barras::before { content: ""; transform: translateY(-6px); }
 .menu-boton-barras::after  { content: ""; transform: translateY(4px); }
@@ -266,7 +291,7 @@ body[data-armazon="topbar"] .topbar .marca-lema { display: none; }
   border-radius: 0 3px 3px 0;
   background: var(--degradado);
   transform: translateY(-50%) scaleY(0);
-  transition: transform 0.28s cubic-bezier(0.22, 0.61, 0.36, 1);
+  transition: transform var(--medio) var(--curva-salida);
 }
 .sidenav .nav-link.is-active::before { transform: translateY(-50%) scaleY(1); }
 
@@ -285,12 +310,19 @@ body[data-armazon="topbar"] .topbar .marca-lema { display: none; }
   border-radius: 50%;
   color: var(--texto-tenue);
   border: 1px solid var(--borde);
-  transition: color 0.25s, border-color 0.25s, transform 0.25s;
+  transition:
+    color var(--medio) var(--curva-suave),
+    border-color var(--medio) var(--curva-suave),
+    transform var(--rapido) var(--curva-salida);
 }
-.sidenav-social a:hover {
-  color: var(--acento);
-  border-color: var(--borde-vivo);
-  transform: translateY(-2px);
+.sidenav-social a:active { transform: scale(0.92); }
+
+@media (hover: hover) {
+  .sidenav-social a:hover {
+    color: var(--acento);
+    border-color: var(--borde-vivo);
+    transform: translateY(var(--levanta));
+  }
 }
 
 /* En el armazón de columna, la marca de la barra superior solo se ve en
@@ -313,7 +345,11 @@ body[data-armazon="sidebar"] .marca-movil { display: none; }
   padding: 0 1.5rem;
 }
 
-/* ----------------------- CABECERA DE SECCIÓN ----------------------- */
+/* ----------------------- CABECERA DE SECCIÓN -----------------------
+   Tres niveles y en este orden: antetítulo (dónde estoy) → título (de qué va)
+   → bajada (por qué me importa). El salto de tamaño entre ellos es lo que
+   hace que la mirada los recorra sin volver atrás: 13px en mayúsculas,
+   30-44px, 18px. Si los tres se parecen, el visitante lee los tres. */
 .section-head {
   text-align: center;
   margin-bottom: 2.5rem;
@@ -321,15 +357,17 @@ body[data-armazon="sidebar"] .marca-movil { display: none; }
 .section-eyebrow {
   display: inline-block;
   margin-bottom: 0.6rem;
-  font-size: 0.78rem;
+  font-size: var(--txt-menudo);
   font-weight: 700;
-  letter-spacing: 0.18em;
+  letter-spacing: var(--tracking-antetitulo);
   text-transform: uppercase;
   color: var(--acento);
 }
 .section-title {
   margin: 0;
-  font-size: clamp(1.9rem, 4vw, 2.8rem);
+  font-size: var(--txt-t2);
+  line-height: var(--interlinea-display);
+  letter-spacing: var(--tracking-display);
   /* El degradado se recorta al texto. `-webkit-` sigue siendo necesario:
      sin él, en WebKit el texto se ve transparente. */
   background: var(--degradado-texto);
@@ -358,10 +396,13 @@ body[data-armazon="sidebar"] .marca-movil { display: none; }
   box-shadow: 0 0 14px var(--brillo-acento);
 }
 .section-subtitle {
-  max-width: 700px;
+  /* Medida en `ch`: el subtítulo es la única línea larga de la cabecera y su
+     ancho tiene que seguir al tamaño de letra, no a un número de píxeles. */
+  max-width: var(--medida-guia);
   margin: 0.9rem auto 0;
   color: var(--texto-tenue);
-  font-size: 1rem;
+  font-size: var(--txt-guia);
+  line-height: var(--interlinea-guia);
 }
 
 /* ----------------------- SEPARADOR DE ZONA -----------------------

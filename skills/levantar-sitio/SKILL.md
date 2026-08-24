@@ -28,7 +28,7 @@ trabaja ahí mismo: los documentos fuente se quedan, y se mueven a `tools/`
 > un asset. Van a `tools/`, y si el usuario quiere publicar alguno, se decide
 > explícitamente y se copia a `assets/docs/`.
 
-## Los seis pasos
+## Los siete pasos
 
 ### ① Briefing — `skills/recopilar-briefing/SKILL.md`
 
@@ -58,13 +58,27 @@ Una sección por vez, en el orden del briefing. Tras cada una, `npm run check`.
 
 Salida: el sitio con su contenido real.
 
-### ⑤ Publicar — `skills/publicar-sitio/SKILL.md`
+### ⑤ Acabado — `skills/pulir-acabado/SKILL.md`
+
+Seis ejes en orden —jerarquía, tipografía, interacción, revelado, detalle,
+móvil— buscando lo que se salió del sistema de tokens. **No es rehacer el
+diseño:** la plantilla ya trae el acabado montado; esta pasada busca lo que se
+escapó, y `npm run check` caza sola la mitad (colores, tamaños y duraciones
+literales).
+
+Aquí también se prepara el **guion de la revisión visual**: catorce preguntas
+concretas, siete de ellas para el teléfono, que es donde ocurre la primera
+impresión de la mayoría y lo único que no se puede verificar desde aquí.
+
+Salida: el sitio revisado y la lista de preguntas enviada al usuario.
+
+### ⑥ Publicar — `skills/publicar-sitio/SKILL.md`
 
 Repo en GitHub, primer push, Actions, verificación en producción.
 
 Salida: URL que funciona.
 
-### ⑥ Hito — `skills/registrar-hito/SKILL.md`
+### ⑦ Hito — `skills/registrar-hito/SKILL.md`
 
 En el proyecto hijo: `.claude/hitos/0001-…`. Qué se construyó, qué se decidió
 y qué quedó pendiente.
@@ -78,6 +92,9 @@ y qué quedó pendiente.
 | Imagen que no aparece ni en local | No está declarada en `scripts/copy-assets.js` | Vite no ve las rutas dentro de strings de HTML |
 | El formulario dice «pendiente de confirmación» | FormSubmit no tiene el buzón validado | Es lo normal la primera vez. Hay que aceptar el correo que llega |
 | El menú móvil se queda abierto al pasar a escritorio | El `@media` de `responsive.css` y el `matchMedia` de `shell.js` no hablan del mismo ancho | Cambiar **los dos**. `referencia/trampas.md` 21 |
+| Una tarjeta se queda levantada después de tocarla en el celular | Un `:hover` fuera de `@media (hover: hover)` | `trampas.md` 22 |
+| La pantalla hace zoom sola al tocar un campo en iPhone | Campo por debajo de 16px en táctil | `trampas.md` 23 |
+| `npm run check` se queja de un color, un tamaño o una duración literal | Alguien escribió el valor a mano en un componente | Token en `tokens.css`. Es la regla 5, 14 o 15 |
 | El menú de escritorio ocupa dos líneas | Etiquetas largas + el lema de la marca comiendo espacio | Ya resuelto en la plantilla. Si vuelve, `trampas.md` 20 |
 | Una franja recta separa la portada de la primera sección | Se tocó la máscara de `.hero-fondo` | `trampas.md` 18 |
 | `npm install` falla por SSL | Proxy corporativo | `npm config set strict-ssl false` |
@@ -94,7 +111,7 @@ Aquí **no hay navegador automatizado**. Lo que se puede afirmar con pruebas:
 Lo que **no** se puede afirmar sin que lo mire el usuario: que se ve bien.
 Alineaciones, saltos de línea de los títulos, si una foto queda recortada
 donde importa, cómo se siente en un celular real. Pídele esa pasada y dilo
-claramente en vez de darlo por bueno.
+claramente en vez de darlo por bueno — el guion de preguntas está en el paso ⑤.
 
 ## Lo que el cliente comenta en la primera revisión
 

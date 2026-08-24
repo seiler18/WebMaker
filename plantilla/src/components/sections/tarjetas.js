@@ -81,7 +81,12 @@ export function renderTarjetas(t) {
 
   const contenido = `
     ${filtros}
-    <div class="rejilla" data-densidad="${t.densidad || 'amplia'}" data-rejilla="${t.id}">
+    <!-- data-anim-secuencia: las tarjetas entran escalonadas en vez de todas
+         a la vez. Va en la rejilla y no en cada tarjeta porque el retardo lo
+         calcula reveal.js con la posición del hijo: añadir una tarjeta no
+         obliga a renumerar nada. -->
+    <div class="rejilla" data-densidad="${t.densidad || 'amplia'}" data-rejilla="${t.id}"
+         data-anim-secuencia>
       ${items.map(tarjeta).join('')}
     </div>
     <p class="rejilla-vacia" hidden>No hay nada en esta área todavía.</p>

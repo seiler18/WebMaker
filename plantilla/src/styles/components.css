@@ -3,17 +3,40 @@
 
    Todo lo que se repite en más de una sección. Si un estilo solo lo usa una
    sección concreta, tiene más sentido dejarlo junto a ella.
+
+   Dos reglas de este archivo, además de las de tokens.css:
+
+   · TODO `:hover` va dentro de un `@media (hover: hover)`. En pantalla táctil
+     el hover se aplica al tocar y se queda pegado hasta el siguiente toque
+     (trampas.md 22). Lo que responde al dedo es `:active`, que sí está fuera.
+   · El movimiento sale de los tokens (--rapido/--medio/--lento y las curvas).
+     Duraciones a mano es cómo se llega a que dos fichas vecinas respondan a
+     distinta velocidad.
    ============================================================ */
 
 /* ----------------------- ANIMACIÓN DE ENTRADA -----------------------
    Estado inicial de [data-anim]; src/lib/reveal.js añade .anim-visible al
    entrar en pantalla. Si el JS fallara, el contenido quedaría invisible, así
-   que reveal.js marca todo como visible también cuando no puede observar. */
+   que reveal.js marca todo como visible también cuando no puede observar.
+
+   Cuatro variantes, y la elección no es decorativa: el movimiento tiene que
+   apuntar hacia donde el contenido «viene». Lo que sube (`subir`) se lee como
+   contenido que entra al leer hacia abajo; lo que aparece sin moverse
+   (`aparecer`) es para lo que ya está en su sitio y solo tiene que llegar
+   —un titular, una foto—; `escala` es para lo que quiere sentirse cercano;
+   `lateral`, para lo que acompaña a un texto. Con las cuatro a la vez en la
+   misma pantalla no se percibe ritmo, se percibe ruido: una por sección. */
 [data-anim] {
   opacity: 0;
-  transform: translateY(18px);
-  transition: opacity 0.6s ease-out, transform 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
+  transition:
+    opacity var(--lento) var(--curva-salida),
+    transform var(--lento) var(--curva-salida);
 }
+[data-anim="subir"]    { transform: translateY(18px); }
+[data-anim="aparecer"] { transform: none; }
+[data-anim="escala"]   { transform: scale(0.96); }
+[data-anim="lateral"]  { transform: translateX(-24px); }
+
 [data-anim].anim-visible { opacity: 1; transform: none; }
 
 @media (prefers-reduced-motion: reduce) {
@@ -82,7 +105,7 @@
     radial-gradient(680px circle at 22% 25%, var(--brillo-movil), transparent 62%),
     radial-gradient(560px circle at 80% 68%, var(--brillo-movil-acento), transparent 58%),
     radial-gradient(620px circle at 45% 95%, var(--brillo-movil-frio), transparent 60%);
-  animation: luces-hero 15s ease-in-out infinite alternate;
+  animation: luces-hero var(--ciclo-luces) ease-in-out infinite alternate;
   will-change: transform;
 }
 
@@ -113,7 +136,7 @@
   background-size: 54px 54px;
   mask-image: radial-gradient(circle at 50% 40%, #000 30%, transparent 75%);
   -webkit-mask-image: radial-gradient(circle at 50% 40%, #000 30%, transparent 75%);
-  animation: rejilla-deriva 22s linear infinite;
+  animation: rejilla-deriva var(--ciclo-rejilla) linear infinite;
 }
 
 @keyframes rejilla-deriva {
@@ -125,15 +148,22 @@
 
 .hero-antetitulo {
   margin: 0 0 1rem;
-  font-size: 0.82rem;
+  font-size: var(--txt-menudo);
   font-weight: 700;
-  letter-spacing: 0.2em;
+  letter-spacing: var(--tracking-antetitulo);
   text-transform: uppercase;
   color: var(--acento);
 }
 .hero-titulo {
   margin: 0;
-  font-size: clamp(2.4rem, 7vw, 4.4rem);
+  font-size: var(--txt-t1);
+  line-height: var(--interlinea-display);
+  letter-spacing: var(--tracking-display);
+  /* Ancho de medida para que el nombre no se estire en una sola línea
+     kilométrica en un monitor ancho: dos líneas centradas y equilibradas
+     (`text-wrap: balance`, en base.css) se leen de un golpe de vista. */
+  max-width: var(--medida-titular);
+  margin-inline: auto;
   /* Arranca en blanco, no en el primario claro: el título cae justo encima de
      las luces del fondo y con el degradado de los títulos de sección se
      fundía con ellas. */
@@ -151,16 +181,19 @@
 }
 .hero-lema {
   margin: 0.6rem 0 0;
-  font-size: clamp(1rem, 2.4vw, 1.35rem);
+  font-size: var(--txt-guia);
   font-weight: 700;
   color: var(--primario-claro);
   /* Este sí lleva relleno, así que aquí `text-shadow` es lo correcto. */
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
 }
 .hero-bajada {
-  max-width: 640px;
+  /* La medida en `ch` y no en px: el largo cómodo de línea depende del tamaño
+     de letra, y este texto crece con la pantalla. */
+  max-width: var(--medida-guia);
   margin: 1.5rem auto 0;
-  font-size: 1.05rem;
+  font-size: var(--txt-guia);
+  line-height: var(--interlinea-guia);
   color: var(--texto);
 }
 
@@ -184,16 +217,16 @@
 .hero-cinta-dato {
   display: block;
   font-family: var(--fuente-titulos);
-  font-size: 1.9rem;
+  font-size: var(--txt-cifra);
   font-weight: 800;
   color: var(--acento);
-  line-height: 1.1;
+  line-height: var(--interlinea-display);
 }
 .hero-cinta-pie {
-  font-size: 0.8rem;
+  font-size: var(--txt-micro);
   color: var(--texto-tenue);
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: var(--tracking-etiqueta);
 }
 
 /* Indicador de «hay más abajo» */
@@ -209,9 +242,8 @@
   border: 1px solid var(--borde);
   border-radius: 50%;
   color: var(--texto-tenue);
-  animation: hero-latido 2.4s ease-in-out infinite;
+  animation: hero-latido var(--ciclo-latido) ease-in-out infinite;
 }
-.hero-scroll:hover { color: var(--acento); border-color: var(--borde-vivo); }
 @keyframes hero-latido {
   0%, 100% { transform: translateX(-50%) translateY(0); }
   50%      { transform: translateX(-50%) translateY(6px); }
@@ -228,33 +260,29 @@
   border: none;
   border-radius: 999px;
   font-family: var(--fuente-texto);
-  font-size: 0.95rem;
+  font-size: var(--txt-ui);
   font-weight: 700;
   cursor: pointer;
-  transition: transform 0.25s ease, box-shadow 0.25s ease,
-              background-color 0.25s ease, color 0.25s ease;
+  /* Quita el retardo de ~300ms que algunos navegadores móviles esperan por si
+     el toque era un doble toque para hacer zoom. Es la diferencia entre un
+     botón que responde y uno que «va lento» sin que nada esté lento. */
+  touch-action: manipulation;
+  transition:
+    transform var(--rapido) var(--curva-salida),
+    box-shadow var(--medio) var(--curva-salida),
+    background-color var(--medio) var(--curva-suave),
+    color var(--medio) var(--curva-suave);
 }
 .btn.primario,
 .hero-btn.primario {
   background: var(--degradado);
   color: #fff;
 }
-.btn.primario:hover,
-.hero-btn.primario:hover {
-  color: #fff;
-  transform: translateY(-2px);
-  box-shadow: 0 0 24px var(--brillo-acento);
-}
 .btn.fantasma,
 .hero-btn.fantasma {
   background: var(--superficie-velada);
   border: 1px solid var(--borde-vivo);
   color: var(--acento);
-}
-.btn.fantasma:hover,
-.hero-btn.fantasma:hover {
-  background: var(--surface-2);
-  transform: translateY(-2px);
 }
 .btn:disabled {
   opacity: 0.55;
@@ -263,16 +291,29 @@
   box-shadow: none;
 }
 
+/* ACUSE DE RECIBO DE LA PULSACIÓN. Fuera del `@media (hover)` a propósito:
+   esto es lo único que responde en una pantalla táctil, donde no hay hover, y
+   es lo que hace que pulsar se sienta como pulsar y no como esperar. Va con
+   --rapido: por encima de 150ms el botón se hunde DESPUÉS de que el dedo ya
+   se ha levantado. */
+.btn:active:not(:disabled),
+.hero-btn:active {
+  transform: translateY(var(--hunde)) scale(0.985);
+  box-shadow: none;
+}
+
 /* Enlace-botón discreto, para dentro de una tarjeta */
 .btn-linea {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  font-size: 0.88rem;
+  font-size: var(--txt-ui);
   font-weight: 700;
 }
-.btn-linea i { font-size: 0.75rem; transition: transform 0.25s ease; }
-.btn-linea:hover i { transform: translateX(3px); }
+.btn-linea i {
+  font-size: var(--icono-menudo);
+  transition: transform var(--medio) var(--curva-salida);
+}
 
 .btn-descarga {
   display: inline-flex;
@@ -284,15 +325,41 @@
   border-radius: var(--radio-sm);
   background: var(--superficie-velada);
   color: var(--texto);
-  font-size: 0.82rem;
+  font-size: var(--txt-menudo);
   font-weight: 700;
-  transition: border-color 0.25s, box-shadow 0.25s, color 0.25s, transform 0.25s;
+  touch-action: manipulation;
+  transition:
+    border-color var(--medio) var(--curva-suave),
+    box-shadow var(--medio) var(--curva-salida),
+    color var(--medio) var(--curva-suave),
+    transform var(--rapido) var(--curva-salida);
 }
-.btn-descarga:hover {
-  color: var(--texto-fuerte);
-  border-color: var(--acento);
-  box-shadow: 0 0 18px var(--brillo-acento);
-  transform: translateY(-2px);
+.btn-descarga:active { transform: translateY(var(--hunde)); }
+
+@media (hover: hover) {
+  .btn.primario:hover,
+  .hero-btn.primario:hover {
+    color: #fff;
+    transform: translateY(var(--levanta));
+    box-shadow: 0 0 24px var(--brillo-acento);
+  }
+  .btn.fantasma:hover,
+  .hero-btn.fantasma:hover {
+    background: var(--surface-2);
+    transform: translateY(var(--levanta));
+  }
+  /* La flecha se adelanta: dice hacia dónde lleva el enlace antes de pulsarlo.
+     3px son suficientes; con 8px parece que se va a salir de la tarjeta. */
+  .btn-linea:hover i { transform: translateX(3px); }
+
+  .btn-descarga:hover {
+    color: var(--texto-fuerte);
+    border-color: var(--acento);
+    box-shadow: 0 0 18px var(--brillo-acento);
+    transform: translateY(var(--levanta));
+  }
+
+  .hero-scroll:hover { color: var(--acento); border-color: var(--borde-vivo); }
 }
 
 /* ----------------------- BLOQUE DE TEXTO ----------------------- */
@@ -306,9 +373,13 @@
    lector de pantalla recorre siempre texto → imagen. */
 .bloque-dos-columnas[data-lado="izquierda"] .bloque-figura { order: -1; }
 
-.bloque-texto { font-size: 1.05rem; }
+/* La prosa va en el tamaño de lectura (--txt-guia, 18px) y no en el del
+   cuerpo: es el texto por el que el visitante se entera de a qué se dedica el
+   cliente, y 16px con 1.65 de interlineado en una columna ancha se lee como
+   documentación, no como una presentación. */
+.bloque-texto { font-size: var(--txt-guia); }
 .bloque-texto.centrado {
-  max-width: var(--ancho-texto);
+  max-width: var(--medida-cuerpo);
   margin: 0 auto;
   text-align: center;
 }
@@ -322,7 +393,7 @@
 }
 .bloque-figura figcaption {
   margin-top: 0.6rem;
-  font-size: 0.82rem;
+  font-size: var(--txt-menudo);
   color: var(--texto-tenue);
   text-align: center;
 }
@@ -344,12 +415,12 @@
 }
 .destacado i {
   flex-shrink: 0;
-  font-size: 1.4rem;
+  font-size: var(--icono-grande);
   color: var(--acento);
   filter: drop-shadow(0 0 10px var(--brillo-acento));
 }
 .destacado strong { display: block; margin-bottom: 0.25rem; }
-.destacado p { margin: 0; font-size: 0.92rem; color: var(--texto-tenue); }
+.destacado p { margin: 0; font-size: var(--txt-ui); color: var(--texto-tenue); }
 
 /* ----------------------- REJILLA DE TARJETAS -----------------------
    `auto-fill` + `minmax`: tantas columnas como caben y una sola en móvil,
@@ -385,35 +456,50 @@
 .tarjeta,
 .destacado {
   transition:
-    transform 0.28s ease,
-    box-shadow 0.28s ease,
-    border-color 0.28s ease,
-    background-color 0.28s ease;
-}
-
-.tarjeta:hover,
-.destacado:hover {
-  transform: translateY(-6px);
-  border-color: var(--borde-vivo);
-  background-color: var(--superficie-viva);
-  /* La sombra negra hace el trabajo de despegar la ficha del fondo; `--brillo`
-     a secas queda casi invisible sobre un fondo oscuro. El borde interior
-     remata el contorno sin mover el layout (un `border` más grueso sí lo
-     movería). */
-  box-shadow:
-    0 18px 44px rgba(0, 0, 0, 0.45),
-    0 0 0 1px var(--borde-vivo) inset,
-    0 10px 30px var(--brillo);
-}
-
-/* El icono acompaña: sin esto el movimiento se siente solo en el marco. */
-.tarjeta:hover .tarjeta-icono,
-.destacado:hover i {
-  transform: scale(1.06);
-  filter: drop-shadow(0 0 14px var(--brillo-acento));
+    transform var(--medio) var(--curva-salida),
+    box-shadow var(--medio) var(--curva-salida),
+    border-color var(--medio) var(--curva-suave),
+    background-color var(--medio) var(--curva-suave);
 }
 .tarjeta-icono,
-.destacado i { transition: transform 0.28s ease, filter 0.28s ease; }
+.destacado i {
+  transition:
+    transform var(--medio) var(--curva-salida),
+    filter var(--medio) var(--curva-salida);
+}
+
+@media (hover: hover) {
+  .tarjeta:hover,
+  .destacado:hover {
+    transform: translateY(var(--levanta-ficha));
+    border-color: var(--borde-vivo);
+    background-color: var(--superficie-viva);
+    /* La sombra negra hace el trabajo de despegar la ficha del fondo; `--brillo`
+       a secas queda casi invisible sobre un fondo oscuro. El borde interior
+       remata el contorno sin mover el layout (un `border` más grueso sí lo
+       movería). */
+    box-shadow:
+      var(--sombra-alta),
+      0 0 0 1px var(--borde-vivo) inset,
+      0 10px 30px var(--brillo);
+  }
+
+  /* El icono acompaña: sin esto el movimiento se siente solo en el marco. */
+  .tarjeta:hover .tarjeta-icono,
+  .destacado:hover i {
+    transform: scale(1.06);
+    filter: drop-shadow(0 0 14px var(--brillo-acento));
+  }
+}
+
+/* En pantalla táctil no hay hover, pero la ficha sí puede acusar el toque.
+   Solo si es pulsable: una tarjeta sin enlace que se hunde al tocarla promete
+   algo que no va a pasar. */
+.tarjeta:has(a):active,
+.destacado:has(a):active {
+  transform: translateY(var(--hunde));
+  border-color: var(--borde-vivo);
+}
 
 /* El teclado tiene que ver lo mismo que el ratón: una ficha con enlace recibe
    foco y sin esto no pasaba nada visible. */
@@ -442,7 +528,7 @@
   border: 1px solid var(--borde);
 }
 .tarjeta-icono i {
-  font-size: 1.4rem;
+  font-size: var(--icono-grande);
   color: var(--acento);
   filter: drop-shadow(0 0 10px var(--brillo-acento));
 }
@@ -453,8 +539,11 @@
   flex: 1;
   padding: 1.25rem;
 }
-.tarjeta-titulo { margin: 0 0 0.5rem; font-size: 1.08rem; }
-.tarjeta-texto { margin: 0; font-size: 0.94rem; color: var(--texto-tenue); }
+/* Título 18px / texto 15px. El salto tiene que ser visible sin leer: con
+   1.08rem y 0.94rem (lo que había antes) los dos textos se veían del mismo
+   tamaño y la tarjeta no tenía jerarquía, solo dos párrafos. */
+.tarjeta-titulo { margin: 0 0 0.5rem; font-size: var(--txt-guia); }
+.tarjeta-texto { margin: 0; font-size: var(--txt-ui); color: var(--texto-tenue); }
 /* `margin-top: auto` empuja la acción al fondo → todos los enlaces de la
    fila quedan a la misma altura aunque los textos ocupen 1 o 3 líneas. */
 .tarjeta-accion { margin: auto 0 0; padding-top: 1rem; }
@@ -479,12 +568,18 @@
   background: var(--superficie-velada);
   color: var(--texto-tenue);
   font-family: inherit;
-  font-size: 0.86rem;
+  font-size: var(--txt-ui);
   font-weight: 600;
   cursor: pointer;
-  transition: color 0.25s, border-color 0.25s, background 0.25s, box-shadow 0.25s;
+  touch-action: manipulation;
+  transition:
+    color var(--medio) var(--curva-suave),
+    border-color var(--medio) var(--curva-suave),
+    background var(--medio) var(--curva-suave),
+    box-shadow var(--medio) var(--curva-salida),
+    transform var(--rapido) var(--curva-salida);
 }
-.filtro:hover { color: var(--texto-fuerte); border-color: var(--borde-vivo); }
+.filtro:active { transform: scale(0.96); }
 .filtro.is-active {
   color: var(--texto-fuerte);
   background: var(--primario-tenue-fuerte);
@@ -499,10 +594,14 @@
   padding: 0 0.35rem;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.08);
-  font-size: 0.72rem;
+  font-size: var(--txt-micro);
   font-weight: 700;
 }
 .filtro.is-active .filtro-cuenta { background: var(--degradado); color: #fff; }
+
+@media (hover: hover) {
+  .filtro:hover { color: var(--texto-fuerte); border-color: var(--borde-vivo); }
+}
 
 /* ----------------------- CONTACTO ----------------------- */
 .contacto-columnas {
@@ -531,7 +630,7 @@
 .campo label {
   display: block;
   margin-bottom: 0.3rem;
-  font-size: 0.85rem;
+  font-size: var(--txt-menudo);
   font-weight: 600;
   color: var(--texto-tenue);
 }
@@ -545,7 +644,13 @@
   border: 1px solid var(--borde);
   border-radius: var(--radio-sm);
   font-family: inherit;
-  font-size: 0.95rem;
+  /* En móvil sube a 16px (responsive.css, bloque `pointer: coarse`): por
+     debajo de eso Safari de iOS hace zoom al enfocar el campo y deja el
+     formulario descuadrado a media pantalla. */
+  font-size: var(--txt-ui);
+  transition:
+    border-color var(--rapido) var(--curva-suave),
+    box-shadow var(--rapido) var(--curva-salida);
 }
 .campo textarea { resize: vertical; min-height: 110px; }
 .campo input:focus,
@@ -555,7 +660,7 @@
   border-color: var(--acento);
   box-shadow: 0 0 0 3px var(--brillo);
 }
-.campo ::placeholder { color: rgba(148, 163, 184, 0.7); }
+.campo ::placeholder { color: var(--texto-marca); }
 
 /* La trampa para bots NO se oculta con display:none: algunos bots ignoran
    los campos ocultos así. Del teclado y del lector de pantalla ya se
@@ -581,9 +686,9 @@
 .contacto-aviso {
   min-height: 1.4em;
   margin: 1rem 0 0;
-  font-size: 0.9rem;
+  font-size: var(--txt-ui);
   opacity: 0;
-  transition: opacity 0.25s;
+  transition: opacity var(--medio) var(--curva-suave);
 }
 .contacto-aviso.visible { opacity: 1; }
 .contacto-aviso.ok    { color: var(--ok); }
@@ -596,7 +701,7 @@
   border: 1px solid var(--borde);
   border-radius: var(--radio);
 }
-.contacto-datos h3 { font-size: 1.05rem; }
+.contacto-datos h3 { font-size: var(--txt-guia); }
 .canales { display: flex; flex-direction: column; gap: 1.1rem; }
 .canales li { display: flex; gap: 0.8rem; align-items: flex-start; }
 .canales i {
@@ -608,9 +713,9 @@
 }
 .canal-etiqueta {
   display: block;
-  font-size: 0.72rem;
+  font-size: var(--txt-micro);
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: var(--tracking-etiqueta);
   text-transform: uppercase;
   color: var(--texto-tenue);
 }
@@ -631,24 +736,23 @@
   padding: 0 1.5rem 2.5rem;
 }
 .pie h2 {
-  font-size: 0.78rem;
+  font-size: var(--txt-menudo);
   font-weight: 700;
-  letter-spacing: 0.14em;
+  letter-spacing: var(--tracking-antetitulo);
   text-transform: uppercase;
   color: var(--texto-tenue);
 }
 .pie-nombre {
   font-family: var(--fuente-titulos);
-  font-size: 1.15rem;
+  font-size: var(--txt-guia);
   font-weight: 800;
   color: var(--texto-fuerte);
 }
-.pie-lema { margin: 0.3rem 0 0; color: var(--texto-tenue); font-size: 0.92rem; }
-.pie-dato { margin: 0.8rem 0 0; font-size: 0.92rem; }
+.pie-lema { margin: 0.3rem 0 0; color: var(--texto-tenue); font-size: var(--txt-ui); }
+.pie-dato { margin: 0.8rem 0 0; font-size: var(--txt-ui); }
 
 .pie-nav ul { display: flex; flex-direction: column; gap: 0.4rem; }
-.pie-nav a { color: var(--texto-tenue); font-size: 0.92rem; }
-.pie-nav a:hover { color: var(--acento); }
+.pie-nav a { color: var(--texto-tenue); font-size: var(--txt-ui); }
 
 .pie-redes-lista { display: flex; flex-direction: column; gap: 0.5rem; }
 .pie-redes-lista a {
@@ -656,16 +760,20 @@
   align-items: center;
   gap: 0.5rem;
   color: var(--texto-tenue);
-  font-size: 0.92rem;
+  font-size: var(--txt-ui);
 }
-.pie-redes-lista a:hover { color: var(--acento); }
+
+@media (hover: hover) {
+  .pie-nav a:hover,
+  .pie-redes-lista a:hover { color: var(--acento); }
+}
 
 .pie-legal {
   margin: 0;
   padding: 1.25rem 1.5rem;
   border-top: 1px solid var(--borde);
   text-align: center;
-  font-size: 0.85rem;
+  font-size: var(--txt-menudo);
   color: var(--texto-tenue);
 }
 
@@ -681,7 +789,7 @@ dialog.modal {
   overflow: visible;
 }
 dialog.modal::backdrop {
-  background: rgba(3, 6, 15, 0.72);
+  background: var(--velo-modal);
   -webkit-backdrop-filter: blur(4px);
   backdrop-filter: blur(4px);
 }
@@ -704,7 +812,7 @@ dialog.modal::backdrop {
   border-bottom: 1px solid var(--borde);
 }
 .modal-pie { border-bottom: none; border-top: 1px solid var(--borde); justify-content: flex-end; }
-.modal-cabecera h2 { margin: 0; font-size: 1.1rem; }
+.modal-cabecera h2 { margin: 0; font-size: var(--txt-guia); }
 .modal-cuerpo { padding: 1.25rem; overflow-y: auto; }
 .modal-cerrar {
   margin-left: auto;
@@ -714,8 +822,17 @@ dialog.modal::backdrop {
   border: 1px solid var(--borde);
   border-radius: 50%;
   color: var(--texto-tenue);
-  font-size: 1.1rem;
+  font-size: var(--icono-medio);
   line-height: 1;
   cursor: pointer;
+  touch-action: manipulation;
+  transition:
+    color var(--medio) var(--curva-suave),
+    border-color var(--medio) var(--curva-suave),
+    transform var(--rapido) var(--curva-salida);
 }
-.modal-cerrar:hover { color: var(--texto-fuerte); border-color: var(--borde-vivo); }
+.modal-cerrar:active { transform: scale(0.92); }
+
+@media (hover: hover) {
+  .modal-cerrar:hover { color: var(--texto-fuerte); border-color: var(--borde-vivo); }
+}

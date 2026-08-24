@@ -21,7 +21,7 @@ El prefijo `dot-` existe porque un `.gitignore`, un `.github/workflows/` o un
 WebMaker. Y `PROYECTO-CLAUDE.md` no se llama ya `CLAUDE.md` para que no se
 cargue como instrucciones al trabajar dentro de WebMaker.
 
-`dot-claude/` trae el `hitos/README.md` y las cinco skills que hereda cada
+`dot-claude/` trae el `hitos/README.md` y las seis skills que hereda cada
 proyecto: `editar-contenido`, `agregar-seccion`, `desplegar`,
 `optimizar-imagenes` y `registrar-hito`.
 

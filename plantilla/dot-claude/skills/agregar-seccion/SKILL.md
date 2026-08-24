@@ -99,10 +99,22 @@ saberlo antes.
 
 1. `src/components/sections/<nombre>.js`, envolviendo con `seccion()` para
    heredar separador, contenedor de ancho y cabecera.
-2. Estilos en `src/styles/components.css`. Con tokens, ningún color literal.
-3. Si necesita conducta, exporta `init<Nombre>()` y llámala en `src/main.js`.
-4. Fila en el mapa.
-5. `npm run check`.
+2. Estilos en `src/styles/components.css`, **solo con tokens**: ni un color, ni
+   un tamaño de letra, ni una duración escritos a mano. El verificador rechaza
+   los tres (puntos 8, 9 y 10), así que no es una recomendación. Los tamaños se
+   eligen por PAPEL entre los `--txt-*`, no por parecido.
+3. Si hay hermanos que entran juntos, `data-anim-secuencia` en el contenedor y
+   `data-anim` en cada hijo (`subir`, `aparecer`, `escala`, `lateral`). Sin eso
+   aparecen todos a la vez, que se lee como un salto de la página.
+4. Si algo es pulsable: los cuatro estados —normal, `:hover` **dentro de**
+   `@media (hover: hover)`, `:active` fuera, `:focus-visible`— y 44px de alto
+   mínimo en el bloque `@media (pointer: coarse)` de `responsive.css`. En
+   táctil no hay hover: lo que acusa el toque es `:active`.
+5. Anima `transform` u `opacity`. Cualquier otra propiedad repinta la maqueta
+   en cada fotograma y se nota en un teléfono de gama media.
+6. Si necesita conducta, exporta `init<Nombre>()` y llámala en `src/main.js`.
+7. Fila en el mapa.
+8. `npm run check`, y después la skill `revisar-acabado`.
 
 Y si el bloque nuevo podría servirle a otro sitio, dilo: sube a la plantilla
 de WebMaker y se registra como hito allí.

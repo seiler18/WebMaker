@@ -1,10 +1,13 @@
 /* ============================================================
-   TOKENS — la paleta y las medidas del sitio, en un solo sitio
+   TOKENS — la paleta, la escala tipográfica y el movimiento del sitio
 
-   REGLA DEL PROYECTO: ningún color literal fuera de este archivo. Si
-   necesitas un tono que no está, añádelo aquí como token y úsalo por nombre.
-   En cuanto aparece un `#1a2b3c` suelto en un componente, cambiar la
-   identidad del sitio pasa de editar diez líneas a buscar por todo el CSS.
+   REGLA DEL PROYECTO: fuera de este archivo no hay ningún color literal,
+   ningún tamaño de letra literal y ninguna duración de animación literal.
+   Si necesitas un valor que no está, se añade aquí con nombre y se usa por
+   nombre. `npm run check` lo comprueba (puntos 8, 9 y 10 del verificador):
+   en cuanto aparece un `#1a2b3c`, un `font-size: 0.83rem` o un `0.3s` suelto
+   en un componente, cambiar la identidad del sitio o el ritmo de sus
+   animaciones pasa de editar un bloque a buscar por todo el CSS.
 
    Para cambiar de identidad visual completa, sustituye el bloque de color de
    abajo por una de las paletas de WebMaker/referencia/paletas.md. Las
@@ -39,8 +42,8 @@
      de arriba, así que cambian solos: una paleta nueva solo tiene que definir
      los tokens base y estos se recalculan.
 
-     Existen porque en el primer sitio hecho con esta plantilla estos siete
-     colores estaban escritos a mano como `rgba(37, 99, 235, …)` dentro de
+     Existen porque en el primer sitio hecho con esta plantilla estos colores
+     estaban escritos a mano como `rgba(37, 99, 235, …)` dentro de
      components.css, layout.css y responsive.css. Al cambiar la identidad del
      sitio, el icono de las tarjetas y la barra de navegación se quedaron con
      el azul de la paleta ANTERIOR — y nadie lo vio hasta la revisión visual.
@@ -62,6 +65,15 @@
   --velo:              color-mix(in srgb, var(--bg) 55%, transparent);
   --superficie-velada: color-mix(in srgb, var(--bg-2) 60%, transparent);
 
+  /* Fondo detrás del modal: más oscuro que --velo y casi opaco, porque lo que
+     hay detrás tiene que dejar de competir por la atención. Derivado y no
+     literal para que en una paleta clara no siga siendo azul marino. */
+  --velo-modal:        color-mix(in srgb, var(--bg) 72%, #000000);
+
+  /* Marca de agua de los campos del formulario. Derivada por lo mismo: un
+     gris fijo se vuelve ilegible en cuanto el fondo cambia. */
+  --texto-marca:       color-mix(in srgb, var(--texto-tenue) 70%, transparent);
+
   /* Luces del fondo en movimiento (portada y halos de página). Bastante más
      opacas que --brillo y --brillo-acento: una luz casi transparente se
      desplaza sin que nadie lo perciba, y el fondo parece estático. Los tenues
@@ -78,16 +90,144 @@
   --degradado:      linear-gradient(135deg, var(--primario) 0%, var(--acento) 100%);
   --degradado-texto:linear-gradient(135deg, var(--primario-claro) 0%, var(--acento) 100%);
 
-  /* ----- Tipografía -----
-     Dos familias como máximo: una para títulos y otra para texto. Tres
-     empiezan a leerse como un collage. Si solo usas una, deja las dos
-     variables con el mismo valor. */
+  /* ============================================================
+     TIPOGRAFÍA
+     ============================================================ */
+
+  /* ----- Familias -----
+     Dos como máximo: una para títulos y otra para texto. Tres se leen como un
+     collage. Si solo usas una, deja las dos variables con el mismo valor.
+     El respaldo del sistema no es decorativo: si Google Fonts no carga, el
+     texto tiene que seguir leyéndose. */
   --fuente-titulos: 'Raleway', system-ui, sans-serif;
   --fuente-texto:   'Raleway', system-ui, sans-serif;
+
+  /* ----- Escala -----
+     DIEZ tamaños para todo el sitio, cada uno con UN papel. La versión
+     anterior de esta plantilla tenía veintidós valores distintos repartidos
+     por cuatro archivos —0.82, 0.85, 0.86, 0.88, 0.9, 0.92, 0.94, 0.95…— y
+     ahí está justo la diferencia que se percibe como «hecho a ojo»: dos
+     textos con el mismo papel salían con dos tamaños que no llegan a
+     distinguirse, así que no comunican jerarquía, solo descuido.
+
+     La escala está APRETADA abajo y ABIERTA arriba, y es deliberado: los
+     pasos pequeños son papeles de interfaz, que necesitan diferenciarse poco;
+     los grandes son jerarquía de lectura, que necesita diferenciarse mucho.
+     Un salto de 1.25 entre una etiqueta y un botón dejaría la interfaz
+     gritando.
+
+     Para elegir, pregúntate qué PAPEL cumple el texto, no qué tamaño quieres.
+     Si ningún papel encaja, casi siempre el problema es el diseño y no la
+     escala. */
+  --txt-barra:  0.625rem;    /* 10px — SOLO las etiquetas de la barra inferior
+                                de móvil. Por debajo de esto no se lee. */
+  --txt-micro:  0.75rem;     /* 12px — contadores, pies de cifra, etiquetas */
+  --txt-menudo: 0.8125rem;   /* 13px — antetítulos, navegación, legal, pies de foto */
+  --txt-ui:     0.9375rem;   /* 15px — botones, campos, texto de ficha, pie */
+  --txt-cuerpo: 1rem;        /* 16px — texto por defecto y prosa corta */
+  --txt-guia:   1.125rem;    /* 18px — bajadas, entradillas, títulos de ficha y
+                                prosa larga. El tamaño en el que se LEE. */
+  --txt-t3:     1.375rem;    /* 22px — títulos de tercer nivel */
+
+  /* Los tres grandes son fluidos. `clamp(mínimo, base + vw, máximo)`: crecen
+     con el ancho de la ventana en vez de saltar en un breakpoint, que es lo
+     que deja un título de portada enorme a 992px y ridículo a 991px. */
+  --txt-t2:     clamp(1.875rem, 1.2rem + 2.6vw, 2.75rem);   /* títulos de sección */
+  --txt-t1:     clamp(2.5rem, 1.5rem + 4vw, 4.25rem);       /* título de portada */
+  --txt-cifra:  clamp(1.75rem, 1.35rem + 1.5vw, 2.125rem);  /* cifras de la cinta */
+
+  /* ----- Iconos -----
+     Aparte de la escala de texto: un icono no cumple un papel de lectura, y
+     mezclarlos obliga a elegir entre «el icono se ve bien» y «el texto se lee
+     bien» cada vez que se ajusta uno de los dos. */
+  --icono-grande: 1.375rem;   /* iconos de tarjeta y de destacado */
+  --icono-medio:  1.0625rem;  /* barra inferior de móvil, cerrar el modal */
+  --icono-menudo: 0.75rem;    /* flechas dentro de un enlace */
+
+  /* ----- Interlineado -----
+     Baja al subir el tamaño. Un titular de 68px con el interlineado del
+     cuerpo (1.65) deja un hueco enorme entre sus dos líneas y se lee como dos
+     frases sueltas; el cuerpo con 1.06 se lee como un ladrillo. */
+  --interlinea-display: 1.06;  /* títulos de portada y de sección */
+  --interlinea-titulo:  1.15;  /* el resto de los títulos */
+  --interlinea-guia:    1.5;   /* bajadas y entradillas */
+  --interlinea-cuerpo:  1.65;  /* prosa */
+
+  /* ----- Espaciado entre letras -----
+     El positivo es para las MAYÚSCULAS: sin él una etiqueta en mayúsculas se
+     lee como un bloque compacto. El negativo es para los tamaños grandes: a
+     partir de unos 40px el espaciado normal de la fuente se ve suelto. No hay
+     token para el texto corrido porque ahí lo correcto es no tocarlo. */
+  --tracking-display:    -0.02em;
+  --tracking-antetitulo: 0.18em;
+  --tracking-etiqueta:   0.08em;
+
+  /* ----- Medidas de línea -----
+     El largo de línea es lo que más afecta a la comodidad de lectura, y va en
+     `ch` (anchos de carácter) y no en px: así sigue siendo correcto cuando
+     cambia el tamaño de letra o la familia. Más de unos 75 caracteres y el
+     ojo pierde el renglón al volver; menos de 45 y la lectura se corta a cada
+     línea. */
+  --medida-titular: 24ch;   /* un titular de más de dos líneas no es un titular */
+  --medida-guia:    52ch;   /* bajadas y subtítulos */
+  --medida-cuerpo:  68ch;   /* prosa */
+
+  /* ============================================================
+     MOVIMIENTO
+
+     Tres duraciones y tres curvas para todo el sitio. Antes había siete
+     duraciones (0.2, 0.25, 0.28, 0.6…) escritas a mano regla por regla, y el
+     resultado es que dos elementos vecinos respondían a distinta velocidad:
+     eso no se ve como «uno es más rápido», se siente como que la página no
+     está terminada.
+
+     Cómo elegir: --rapido es la respuesta a una acción del visitante (puntero
+     encima, pulsación), y por encima de unos 150ms deja de sentirse
+     instantánea. --medio es un cambio de estado con desplazamiento. --lento
+     es una entrada o una apertura: lo único que puede permitirse notarse.
+     ============================================================ */
+  --rapido: 120ms;
+  --medio:  240ms;
+  --lento:  420ms;
+
+  /* Curvas. `ease` a secas arranca despacio, y en una respuesta al puntero
+     eso se siente como retraso. --curva-salida arranca rápido y aterriza
+     suave: es la de casi todo. --curva-entrada es para lo que se va (sale
+     acelerando). --curva-suave, simétrica, para transiciones de color. */
+  --curva-salida:  cubic-bezier(0.22, 0.61, 0.36, 1);
+  --curva-entrada: cubic-bezier(0.55, 0, 0.55, 0.2);
+  --curva-suave:   cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Escalonado de las entradas: retardo entre un elemento y el siguiente de
+     la misma secuencia. Lo aplica src/lib/reveal.js. 70ms es el punto en el
+     que una fila se lee como una secuencia y no como un desfile: con 150ms la
+     última tarjeta llega tarde y lo que se percibe es la espera. */
+  --escalonado: 70ms;
+
+  /* Desplazamientos de respuesta. Están aquí para que todo el sitio se
+     levante y se hunda lo mismo: un botón que sube 4px al lado de otro que
+     sube 2px se lee como un error de maqueta. */
+  --levanta:       -2px;   /* botones y enlaces con el puntero encima */
+  --levanta-ficha: -6px;   /* tarjetas y destacados */
+  --hunde:         1px;    /* :active — el acuse de recibo de la pulsación */
+
+  /* Ciclos del fondo animado. Van aquí porque la regla del proyecto es que
+     estén entre 15 y 22s: más largo se percibe como estático, más corto
+     distrae del contenido. Con los valores a la vista cuesta romperla. */
+  --ciclo-halos:   19s;
+  --ciclo-luces:   15s;
+  --ciclo-rejilla: 22s;
+  --ciclo-latido:  2.4s;
 
   /* ----- Formas ----- */
   --radio:         16px;
   --radio-sm:      10px;
+
+  /* Zona pulsable mínima en pantalla táctil. 44px es el mínimo de las guías
+     de Apple y de Google, y no es un capricho: por debajo, el dedo tapa el
+     objetivo justo antes de tocarlo y falla. Lo usa responsive.css dentro de
+     `pointer: coarse`. */
+  --toque-min:     44px;
 
   /* ----- Medidas del armazón -----
      Son tokens y no números sueltos porque las leen varios archivos: el
@@ -100,11 +240,12 @@
   /* Ancho de lectura del contenido. Más de ~1180px y las líneas de texto se
      hacen incómodamente largas en un monitor ancho. */
   --ancho-max:     1180px;
-  --ancho-texto:   72ch;
+  --ancho-texto:   var(--medida-cuerpo);
 
   /* ----- Sombras ----- */
   --sombra:        0 12px 40px rgba(0, 0, 0, 0.45);
   --sombra-suave:  0 6px 20px rgba(0, 0, 0, 0.30);
+  --sombra-alta:   0 18px 44px rgba(0, 0, 0, 0.45);
 
   /* ----- Capas -----
      Escala explícita para no ir adivinando. El modal usa <dialog>, que el

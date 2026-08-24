@@ -43,13 +43,17 @@ empezar a maquetar: es invocar `recopilar-briefing`.
     ④  construir-secciones     ← una sección por vez, desde el briefing
               │
               ▼
-    ⑤  publicar-sitio          ← repo, GitHub Pages, verificación
+    ⑤  pulir-acabado           ← jerarquía, tipografía, interacción,
+              │                   revelado, detalle y móvil. Y el guion
+              │                   de preguntas para la revisión visual
+              ▼
+    ⑥  publicar-sitio          ← repo, GitHub Pages, verificación
               │
               ▼
-    ⑥  registrar-hito          ← memoria, en el proyecto hijo
+    ⑦  registrar-hito          ← memoria, en el proyecto hijo
 ```
 
-Los pasos ② a ⑥ se pueden repetir. El ① se hace una vez y se actualiza
+Los pasos ② a ⑦ se pueden repetir. El ① se hace una vez y se actualiza
 cuando el cliente cambia de idea (y entonces se anota en su hito).
 
 ## Dónde está cada cosa
@@ -61,9 +65,11 @@ cuando el cliente cambia de idea (y entonces se anota en su hito).
 | Elegir colores, tipografía y armazón | `skills/definir-identidad/SKILL.md` |
 | Crear el proyecto y dejarlo compilando | `skills/generar-andamiaje/SKILL.md` |
 | Escribir las secciones | `skills/construir-secciones/SKILL.md` |
+| Dar la pasada de acabado antes de entregar | `skills/pulir-acabado/SKILL.md` |
 | Publicar en GitHub Pages | `skills/publicar-sitio/SKILL.md` |
 | Dejar memoria de lo hecho | `skills/registrar-hito/SKILL.md` |
 | Entender **por qué** el sitio está hecho así | `referencia/arquitectura.md` |
+| Qué hace que un sitio se lea como caro | `referencia/acabado.md` |
 | Recetas de secciones que no vienen de fábrica | `referencia/catalogo-secciones.md` |
 | Paletas listas para usar | `referencia/paletas.md` |
 | Errores ya cometidos, para no repetirlos | `referencia/trampas.md` |
@@ -112,6 +118,8 @@ está explicado en `referencia/trampas.md`.
    los colores base: cambian solos con la paleta. Si falta uno, se añade a ese
    bloque — no al componente. Excepciones: blancos y negros neutros
    (`rgba(0,0,0,…)` de una sombra) no pertenecen a ninguna paleta.
+   **Lo comprueba `npm run check`** (punto 8): se rompió estando escrita, así
+   que ahora falla el build.
    → Cómo se rompió esto la primera vez: `referencia/trampas.md`, trampa 16.
 6. **Rejillas, no carruseles.** Una rejilla `auto-fill` enseña todo, se apila
    sola en móvil y no tiene alto que igualar ni flechas que tapen botones.
@@ -145,6 +153,25 @@ está explicado en `referencia/trampas.md`.
     comparten una regla en `components.css`. Si se retoca una, se retocan las
     dos: tenerlas separadas es cómo se llega a que dos rejillas del mismo
     sitio se comporten distinto.
+14. **Un tamaño de letra = un papel.** Los diez pasos de la escala
+    (`--txt-*`) están en `tokens.css` y se eligen por el papel del texto
+    —etiqueta, interfaz, cuerpo, lectura, título— no por parecido. Un sitio
+    con veintidós tamaños no se ve variado, se ve hecho a ojo: hay parejas que
+    se diferencian en medio píxel y no comunican nada. Lo comprueba
+    `npm run check` (punto 9). El razonamiento completo, en
+    `referencia/acabado.md`.
+15. **Tres duraciones y tres curvas para todo el sitio.** `--rapido` es la
+    respuesta a una acción (por encima de 150ms deja de sentirse instantánea),
+    `--medio` un cambio de estado, `--lento` una entrada. Dos elementos vecinos
+    que responden a distinta velocidad no se leen como «uno es más rápido»,
+    se leen como una página sin terminar. Punto 10 del verificador. Y se anima
+    `transform` u `opacity`: lo demás repinta la maqueta en cada fotograma.
+16. **Todo `:hover` va dentro de `@media (hover: hover)`.** En pantalla táctil
+    el hover se aplica al tocar y se queda pegado hasta el toque siguiente. Lo
+    que responde al dedo es `:active`, que va fuera. Y lo pulsable mide
+    `--toque-min` (44px) en `pointer: coarse`, con los campos del formulario a
+    16px como mínimo — por debajo, Safari de iOS hace zoom al enfocarlos.
+    → `referencia/trampas.md`, trampas 22 a 24.
 
 ## Convenciones
 

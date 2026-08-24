@@ -16,11 +16,13 @@ actual y cómo se trabaja aquí**. No lleva historial: eso vive en
 |---|---|
 | Cambiar un texto, un dato, una tarjeta | `src/data/` — y la skill `editar-contenido` |
 | Añadir o quitar una sección | skill `agregar-seccion` |
+| Revisar el acabado antes de entregar | skill `revisar-acabado` |
 | Publicar los cambios | skill `desplegar` |
 | Saber qué se hizo antes y por qué | `.claude/hitos/` (empieza por su `README.md`) |
 | Qué pidió el cliente y qué quedó fuera | `briefing.md` |
 | Entender por qué el sitio está hecho así | `../WebMaker/referencia/arquitectura.md` |
 | Errores ya cometidos | `../WebMaker/referencia/trampas.md` |
+| Qué hace que un sitio se lea como caro | `../WebMaker/referencia/acabado.md` |
 
 **Antes de una tarea, comprueba si hay una skill que la cubra.** Al terminar
 algo con sustancia, registra el hito (skill `registrar-hito`).
@@ -39,7 +41,8 @@ algo con sustancia, registra el hito (skill `registrar-hito`).
 
 ```bash
 npm run dev      # http://localhost:5173/{{REPO}}/
-npm run check    # integridad: rutas, ids, marcadores, base, anclas
+npm run check    # integridad (rutas, ids, marcadores, base, anclas) + acabado
+                 # (colores, tamaños y duraciones literales, alt, animaciones)
 npm run build    # check + vite build + copy-assets
 npm run preview  # sirve dist/ — único modo que reproduce rutas de producción
 ```
@@ -72,7 +75,13 @@ publicado en `gh-pages`. ~2 minutos. Ver skill `desplegar`.
 
 1. **Contenido en `src/data/`, presentación en `src/components/`.** Ningún
    texto del cliente dentro de un componente.
-2. **Ningún color literal fuera de `src/styles/tokens.css`.**
+2. **Ningún color, tamaño de letra ni duración literal fuera de
+   `src/styles/tokens.css`.** Los colores derivados salen con `color-mix()` y
+   se recalculan solos al cambiar de paleta; los tamaños se eligen por PAPEL
+   entre los diez pasos de la escala (`--txt-*`); el movimiento sale de
+   `--rapido` / `--medio` / `--lento` y de las tres curvas. Lo comprueban los
+   puntos 8, 9 y 10 de `npm run check`, porque las tres reglas ya se rompieron
+   una vez cuando solo estaban escritas.
 3. **`responsive.css` se importa el último** en `main.js`: sus overrides ganan
    por orden de cascada, sin `!important`.
 4. **Rejillas, no carruseles.** Si el contenido no cabe, se filtra.
@@ -86,6 +95,14 @@ publicado en `gh-pages`. ~2 minutos. Ver skill `desplegar`.
    Windows no. Copia el nombre con `ls`, no de memoria.
 9. **Los ids de sección no se cambian** una vez publicados: van en la URL y
    se comparten como enlaces.
+10. **Todo `:hover` va dentro de `@media (hover: hover)`.** En pantalla táctil
+    el hover se aplica al tocar y se queda pegado hasta el toque siguiente. Lo
+    que responde al dedo es `:active`, fuera del bloque.
+11. **Lo pulsable mide 44px** (`--toque-min`) en `@media (pointer: coarse)`, y
+    los campos del formulario 16px como mínimo: por debajo, Safari de iOS hace
+    zoom al enfocarlos y no lo deshace.
+12. **Se anima `transform` y `opacity`.** Lo demás obliga al navegador a
+    recalcular la maqueta en cada fotograma.
 
 ## Convenciones
 

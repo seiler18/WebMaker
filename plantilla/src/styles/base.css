@@ -16,14 +16,21 @@ html {
      no como un teletransporte. Se anula solo para quien pide menos
      movimiento, al final de este archivo. */
   scroll-behavior: smooth;
+
+  /* Reserva el alto de la barra fija en CUALQUIER salto de ancla, venga del
+     menú, del pie o de un enlace compartido. `.section` ya lleva su
+     `scroll-margin-top`, pero la portada y cualquier id que no sea una
+     sección no lo tienen, y ahí el título aterrizaba debajo de la barra. */
+  scroll-padding-top: calc(var(--topbar-h) + 16px);
+
   -webkit-text-size-adjust: 100%;
 }
 
 body {
   margin: 0;
   font-family: var(--fuente-texto);
-  font-size: 1rem;
-  line-height: 1.65;
+  font-size: var(--txt-cuerpo);
+  line-height: var(--interlinea-cuerpo);
   color: var(--texto);
   background-color: var(--bg);
   -webkit-font-smoothing: antialiased;
@@ -55,7 +62,7 @@ body::before {
     radial-gradient(900px circle at 15% 10%, var(--brillo-movil), transparent 48%),
     radial-gradient(700px circle at 95% 5%, var(--brillo-movil-acento), transparent 42%),
     radial-gradient(800px circle at 60% 90%, var(--brillo-movil-frio), transparent 45%);
-  animation: halos-fondo 19s ease-in-out infinite alternate;
+  animation: halos-fondo var(--ciclo-halos) ease-in-out infinite alternate;
   will-change: transform;
 }
 
@@ -66,27 +73,59 @@ body::before {
   100% { transform: translate3d(-3%, 8%, 0) scale(1.2); }
 }
 
-/* ----------------------- TIPOGRAFÍA ----------------------- */
+/* ----------------------- TIPOGRAFÍA -----------------------
+   Los tamaños salen SIEMPRE de la escala de tokens.css. Aquí solo se fija lo
+   que comparten todos los títulos. */
 h1, h2, h3, h4, h5, h6 {
   margin: 0 0 0.6em;
   font-family: var(--fuente-titulos);
   font-weight: 800;
-  line-height: 1.2;
+  line-height: var(--interlinea-titulo);
   color: var(--texto-fuerte);
-  letter-spacing: 0.01em;
+
+  /* Reparte las palabras entre las líneas en vez de dejar la última sola.
+     Es la diferencia entre un título de dos líneas equilibrado y otro con una
+     palabra huérfana debajo — lo primero que delata un título sin cuidar, y
+     no hay forma de arreglarlo a mano porque depende del ancho de cada
+     pantalla. Donde el navegador no lo soporte, simplemente no pasa nada. */
+  text-wrap: balance;
 }
+
+/* Los títulos grandes tienen su propio interlineado y espaciado: a partir de
+   unos 40px el interlineado de un título normal se ve suelto y el espaciado
+   entre letras, disperso. */
+h1 { line-height: var(--interlinea-display); letter-spacing: var(--tracking-display); }
 
 p { margin: 0 0 1em; }
 p:last-child { margin-bottom: 0; }
+
+/* Evita el renglón final con una sola palabra en los párrafos. Es puramente
+   estético y el navegador que no lo entienda lo ignora. */
+p, li { text-wrap: pretty; }
 
 strong, b { color: var(--texto-fuerte); font-weight: 700; }
 
 a {
   color: var(--acento);
   text-decoration: none;
-  transition: color 0.25s ease;
+  transition: color var(--rapido) var(--curva-suave);
 }
-a:hover { color: var(--primario-claro); }
+
+/* El resaltado gris del navegador al tocar un enlace se quita SOLO porque
+   más abajo hay un `:active` propio para cada cosa pulsable. Quitarlo sin
+   sustituto deja la interfaz muerta al tacto: se toca y no pasa nada hasta
+   que la página responde. */
+a, button, summary, [role="button"] {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* El hover se declara aparte y SOLO donde hay puntero. En una pantalla táctil
+   no existe «pasar por encima»: el navegador aplica el :hover al tocar y lo
+   DEJA APLICADO hasta que se toca otra cosa, así que un enlace se queda con
+   el color de hover después de volver atrás. referencia/trampas.md, 22. */
+@media (hover: hover) {
+  a:hover { color: var(--primario-claro); }
+}
 
 img, svg, video {
   max-width: 100%;
@@ -149,7 +188,7 @@ nav ul,
   color: #fff;
   border-radius: 0 0 var(--radio-sm) var(--radio-sm);
   font-weight: 700;
-  transition: top 0.2s ease;
+  transition: top var(--rapido) var(--curva-salida);
 }
 .skip-link:focus { top: 0; color: #fff; }
 

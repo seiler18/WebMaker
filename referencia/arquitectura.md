@@ -125,10 +125,25 @@ que van en strings de HTML y los PDFs no los ve, y por eso
 
 ## El verificador
 
-`npm run check` renderiza el sitio en Node y comprueba siete cosas que un
-build correcto no detecta: marcadores sin rellenar, ids duplicados, orden de
-secciones, modales huérfanos, archivos que no existen, `base` incoherente con
-la URL de producción y anclas que no llevan a ningún sitio.
+`npm run check` renderiza el sitio en Node y comprueba doce cosas que un build
+correcto no detecta. Las siete primeras son de integridad: marcadores sin
+rellenar, ids duplicados, orden de secciones, modales huérfanos, archivos que
+no existen, `base` incoherente con la URL de producción y anclas que no llevan
+a ningún sitio.
+
+Las cinco siguientes son de **acabado**, y se añadieron porque las reglas que
+sostienen —una paleta en un solo sitio, una escala tipográfica, un ritmo de
+animación— llevaban escritas desde el primer día y se rompieron igual:
+colores literales (8), tamaños de letra literales (9), duraciones y curvas
+literales (10), imágenes sin `alt` (11) y variantes de `data-anim` que no
+existen (12). Romperlas no da error en ninguna parte: se ve meses después, en
+una revisión visual, como un icono con el azul de la paleta anterior o como dos
+fichas vecinas que responden a distinta velocidad. → `referencia/acabado.md`.
+
+Los cinco leen el CSS ignorando comentarios y el bloque de
+`prefers-reduced-motion` —ahí las duraciones literales son obligatorias— y lo
+hacen **borrando en blanco**, sin recortar, para que el número de línea que
+informan siga siendo el del archivo real.
 
 Va **dentro** de `npm run build`, así que un enlace roto hace fallar el deploy
 en vez de llegar a producción. Es deliberado: mejor un workflow rojo que un
@@ -137,7 +152,7 @@ sitio publicado sin estilos.
 ## Cascada del CSS
 
 ```
-tokens.css      variables. Ningún selector.
+tokens.css      color, escala tipográfica y movimiento. Ningún selector.
 base.css        reinicio ligero, tipografía, foco, skip-link
 layout.css      armazón y secciones
 components.css  hero, botones, tarjetas, formulario, pie, modal

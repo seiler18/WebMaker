@@ -38,7 +38,7 @@ export function renderContacto() {
     .join('')
 
   const contenido = `
-    <div class="contacto-columnas">
+    <div class="contacto-columnas" data-anim-secuencia>
       <form class="contacto-form" id="formContacto" novalidate data-anim="subir">
         <div class="contacto-grid">
           <div class="campo">

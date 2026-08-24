@@ -75,6 +75,19 @@ Se cambian en dos sitios y nada más:
 Las variables llevan siempre un respaldo del sistema (`system-ui, sans-serif`)
 para que el texto se lea aunque Google Fonts no cargue.
 
+**Lo que NO se elige es la escala.** Los tamaños, interlineados y medidas de
+línea están decididos en `tokens.css` —diez pasos, cada uno con un papel— y son
+los mismos para cualquier tipografía. Cambiar de familia no es motivo para
+tocarlos: si con la fuente nueva algo se ve pequeño, se cambia el paso que usa
+ese elemento, no el valor del paso. El razonamiento está en
+`referencia/acabado.md` y `npm run check` (punto 9) no deja escribir tamaños a
+mano.
+
+Lo único que **sí** conviene revisar al cambiar de familia es
+`--tracking-display`, el espaciado entre letras de los títulos grandes: una
+fuente ancha necesita más negativo que una condensada. Es un número, y se juzga
+mirando el título de la portada.
+
 ## Cómo preguntar
 
 Una tanda, tres preguntas, opciones concretas. Y una recomendación marcada:

@@ -9,6 +9,11 @@ del primer sitio de cliente: todas salieron en la revisión visual, no del
 código.** Esa es la señal de que estas son las que más caro se pagan: el
 verificador no las ve.
 
+**De la 22 a la 26 son las del acabado** (hito
+[0003](../hitos/0003-sistema-de-acabado.md)), y tienen algo en común: cuatro de
+las cinco solo se ven en un teléfono de verdad. Desde un escritorio el sitio
+parece correcto.
+
 ---
 
 ## 1. El `base` de Vite no coincide con el nombre del repo
@@ -360,6 +365,96 @@ escritorio). Se cambió uno y no el otro.
 criterio para moverlo: con **seis o más secciones de etiqueta larga**, entre
 992 y 1200px los enlaces caben pero quedan sin aire, así que conviene subirlo
 a 1199.98 / 1200. Con cuatro o cinco secciones cortas, 991.98 va bien.
+
+---
+
+## 22. El `:hover` se queda pegado en el teléfono
+
+**Síntoma:** en el celular se toca una tarjeta, se vuelve atrás, y la tarjeta
+sigue levantada y con el borde encendido. O un enlace del pie se queda del
+color de hover para siempre.
+
+**Causa:** en una pantalla táctil no existe «pasar por encima». El navegador
+aplica el `:hover` al tocar y lo **deja aplicado** hasta que se toca otra cosa.
+Un `:hover` escrito sin condición se ejecuta también ahí.
+
+**Arreglo:** todos los `:hover` dentro de `@media (hover: hover)`. Lo que
+responde al dedo es `:active`, y ese va **fuera** del bloque — es lo único que
+acusa el toque en un teléfono, así que quitarlo deja la interfaz muerta.
+
+Relacionado: si se quita el resaltado gris del navegador
+(`-webkit-tap-highlight-color: transparent`) sin poner un `:active` propio, el
+resultado es peor que antes: se toca y no pasa absolutamente nada hasta que la
+página reacciona.
+
+---
+
+## 23. Safari de iOS hace zoom al tocar un campo del formulario
+
+**Síntoma:** en un iPhone, al tocar el campo «nombre» la pantalla hace zoom
+sola, el formulario queda a medio encuadre y el zoom no se deshace al salir del
+campo. El visitante escribe su correo mirando media pantalla.
+
+**Causa:** Safari de iOS hace zoom automáticamente sobre cualquier campo con
+letra de menos de 16px. En escritorio no pasa nada de esto, así que se publica
+sin verlo.
+
+**Arreglo:** los campos suben a 16px en `@media (pointer: coarse)`
+(`responsive.css`). No se arregla con `maximum-scale=1` en el viewport: eso
+además impide al usuario hacer zoom a mano, que es un problema de
+accesibilidad de verdad.
+
+---
+
+## 24. Zonas pulsables medidas con `max-width`
+
+**Síntoma:** en el celular se falla al pulsar los enlaces del pie o los botones
+de filtro. En una tableta de 1024px, igual.
+
+**Causa:** dos errores juntos. El primero, que un enlace de texto mide lo que
+mide su línea —unos 20px de alto—, y el dedo tapa el objetivo justo antes de
+tocarlo. El segundo, medir esto por ancho de pantalla: quien falla es el dedo,
+no la pantalla. Una tableta ancha tiene dedos y una ventana estrecha en un
+portátil tiene ratón.
+
+**Arreglo:** bloque `@media (pointer: coarse)` con `--toque-min` (44px), que es
+el mínimo de las guías de Apple y de Google. A los enlaces de una lista se les
+da alto propio (`display: inline-flex; min-height`) en vez de separarlos más,
+que solo estiraría el pie.
+
+---
+
+## 25. El escalonado que se cobra después
+
+**Síntoma:** las tarjetas entran escalonadas y muy bien, pero a partir de ese
+momento la última tarjeta de la fila tarda medio segundo en reaccionar al
+puntero. Y el culpable no está en el CSS de la tarjeta.
+
+**Causa:** el escalonado se hace poniendo `transition-delay` en línea desde el
+JS. Ese retardo es **del elemento**, no de la animación de entrada: se queda
+puesto para siempre y se aplica a todas las transiciones siguientes, incluido
+el levantarse al pasar el puntero.
+
+**Arreglo:** borrar el retardo cuando termina la entrada. `reveal.js` escucha
+`transitionend` una vez y limpia `style.transitionDelay`.
+
+---
+
+## 26. Animar algo que no sea `transform` u `opacity`
+
+**Síntoma:** una animación que en el portátil del que la escribió va fina y en
+un teléfono de gama media va a tirones.
+
+**Causa:** `transform` y `opacity` las resuelve el compositor, sin tocar la
+maqueta. Cualquier otra cosa —`width`, `height`, `top`, `margin`— obliga al
+navegador a recalcular posiciones y repintar en cada fotograma.
+
+**Arreglo:** buscarle la vuelta con `transform`. El subrayado del enlace activo
+crece con `scaleX(0 → 1)` y no con `width`; la barra del enlace de la columna,
+con `scaleY`. Excepción documentada: la rejilla del hero anima
+`background-position`, porque con `transform` se movería también su máscara y
+se vería entrar el borde del recuadro — y es un patrón que se repite, así que
+el bucle es invisible.
 
 ---
 

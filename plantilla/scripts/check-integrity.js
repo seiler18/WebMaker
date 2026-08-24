@@ -12,11 +12,24 @@
      5. Cada archivo local referenciado (imágenes, PDFs) existe en el disco.
      6. `base` de vite.config.js coincide con la URL de producción.
      7. Enlaces de ancla (#algo) que no corresponden a ningún id.
+     8. Ningún color literal fuera de tokens.css.
+     9. Ningún tamaño de letra literal fuera de tokens.css.
+    10. Ninguna duración ni curva de animación literal fuera de tokens.css.
+    11. Toda imagen tiene un `alt` con texto.
+    12. Todo `data-anim` usa una de las variantes que existen.
 
    El punto 5 es el que más veces rompe un sitio: Vite no valida las rutas
    que van dentro de strings de HTML, así que un nombre mal escrito solo se
    ve como imagen rota en producción. Y el 1 evita el clásico bochorno de
    publicar con un marcador de la plantilla a la vista en la portada.
+
+   Los puntos 8 a 10 son los que sostienen el acabado del sitio. Las tres
+   reglas estaban escritas en la documentación desde el primer día y las tres
+   se rompieron igual, porque romperlas no da error en ningún sitio: se ve
+   —meses después, en una revisión visual— como un icono con el azul de la
+   paleta anterior, dos textos del mismo papel con tamaños que no llegan a
+   distinguirse, o dos fichas vecinas que responden al puntero a velocidades
+   distintas. Una regla de acabado que no se comprueba es una intención.
 
    Sale con código 1 si encuentra algún problema → sirve para CI, y va dentro
    de `npm run build`, así que un error hace fallar el deploy en vez de
@@ -152,6 +165,134 @@ for (const m of html.matchAll(/href="#([^"]+)"/g)) {
   const ancla = m[1]
   if (ancla && !vistos.has(ancla)) {
     errores.push(`Enlace a #${ancla}, pero no hay ningún elemento con ese id`)
+  }
+}
+
+/* --- 8, 9 y 10. Disciplina del CSS -----------------------------------
+   tokens.css es el único archivo exento: es justamente el sitio donde estos
+   valores deben estar. */
+const CSS_REVISADOS = ['base.css', 'layout.css', 'components.css', 'responsive.css']
+
+// Blancos y negros neutros no pertenecen a ninguna paleta: la sombra negra de
+// una tarjeta y el texto blanco de un botón son los mismos en todas.
+const HEX_NEUTROS = new Set(['#fff', '#ffffff', '#000', '#000000'])
+const esCanalNeutro = valores =>
+  valores.every(v => v === '0') || valores.every(v => v === '255')
+
+/* Lo que se ignora se BORRA EN BLANCO, no se recorta: se sustituye por
+   espacios y se conservan los saltos de línea. Así los números de línea que
+   se informan siguen siendo los del archivo de verdad — un aviso que apunta a
+   una línea equivocada hace perder más tiempo que no informar de ninguna. */
+const enBlanco = trozo => trozo.replace(/[^\n]/g, ' ')
+
+const sinComentarios = css => css.replace(/\/\*[\s\S]*?\*\//g, enBlanco)
+
+/* El bloque de `prefers-reduced-motion` se salta entero: ahí las duraciones
+   TIENEN que ser literales (`0.01ms !important` apaga las animaciones sin
+   depender de ningún token). Se localiza contando llaves porque dentro hay
+   reglas anidadas. */
+const sinBloqueMenosMovimiento = css => {
+  const i = css.indexOf('@media (prefers-reduced-motion')
+  if (i === -1) return css
+  let nivel = 0
+  for (let j = css.indexOf('{', i); j < css.length; j++) {
+    if (css[j] === '{') nivel++
+    else if (css[j] === '}' && --nivel === 0) {
+      return css.slice(0, i) + enBlanco(css.slice(i, j + 1)) + css.slice(j + 1)
+    }
+  }
+  return css.slice(0, i) + enBlanco(css.slice(i))
+}
+
+const numeroDeLinea = (texto, indice) => texto.slice(0, indice).split('\n').length
+
+for (const archivo of CSS_REVISADOS) {
+  const ruta = join(raiz, 'src/styles', archivo)
+  if (!existsSync(ruta)) continue
+  const bruto = readFileSync(ruta, 'utf8')
+  const css = sinBloqueMenosMovimiento(sinComentarios(bruto))
+
+  // --- 8. Colores literales ---
+  for (const m of css.matchAll(/#[0-9a-fA-F]{3,8}\b/g)) {
+    if (HEX_NEUTROS.has(m[0].toLowerCase())) continue
+    errores.push(
+      `Color literal "${m[0]}" en src/styles/${archivo}, línea ` +
+        `${numeroDeLinea(css, m.index)}. Los colores van en tokens.css y se ` +
+        `usan por nombre (regla 5 del proyecto).`
+    )
+  }
+  for (const m of css.matchAll(/\b(rgba?|hsla?)\(([^)]*)\)/g)) {
+    const canales = m[2].split(/[,/\s]+/).filter(Boolean).slice(0, 3)
+    if (m[1].startsWith('rgb') && esCanalNeutro(canales)) continue
+    errores.push(
+      `Color literal "${m[0]}" en src/styles/${archivo}, línea ` +
+        `${numeroDeLinea(css, m.index)}. Si hace falta un lavado nuevo, se ` +
+        `añade a tokens.css con color-mix() para que cambie solo al cambiar ` +
+        `de paleta.`
+    )
+  }
+
+  // --- 9. Tamaños de letra literales ---
+  for (const m of css.matchAll(/font-size:\s*([^;}]+)/g)) {
+    const valor = m[1].trim()
+    if (valor.startsWith('var(') || valor === 'inherit') continue
+    errores.push(
+      `Tamaño de letra literal "${valor}" en src/styles/${archivo}, línea ` +
+        `${numeroDeLinea(css, m.index)}. Usa un paso de la escala (--txt-*): ` +
+        `un tamaño suelto no crea jerarquía, solo desorden.`
+    )
+  }
+
+  // --- 10. Duraciones y curvas literales ---
+  for (const m of css.matchAll(/(transition|animation)(-duration|-delay)?:\s*([^;}]+)/g)) {
+    // Se quitan los tokens antes de buscar: lo que quede con un número y una
+    // unidad de tiempo es un valor escrito a mano.
+    const valor = m[3].replace(/var\(--[a-z0-9-]+\)/g, '')
+    const tiempo = valor.match(/\d*\.?\d+\s*m?s\b/)
+    if (tiempo) {
+      errores.push(
+        `Duración literal "${tiempo[0].trim()}" en el ${m[1]} de ` +
+          `src/styles/${archivo}, línea ${numeroDeLinea(css, m.index)}. Usa ` +
+          `--rapido, --medio o --lento: el sitio entero tiene que responder a ` +
+          `la misma velocidad.`
+      )
+    }
+    if (valor.includes('cubic-bezier(')) {
+      errores.push(
+        `Curva literal cubic-bezier() en el ${m[1]} de src/styles/${archivo}, ` +
+          `línea ${numeroDeLinea(css, m.index)}. Usa --curva-salida, ` +
+          `--curva-entrada o --curva-suave.`
+      )
+    }
+  }
+}
+
+/* --- 11. Imágenes sin texto alternativo -----------------------------
+   El `alt` no es SEO: es lo que se lee en voz alta y lo que se ve cuando la
+   imagen no carga. Vacío se avisa (a veces una imagen es decorativa de
+   verdad); ausente es un error, porque siempre es un olvido. */
+for (const m of todoElHtml.matchAll(/<img\b[^>]*>/g)) {
+  const alt = m[0].match(/\salt="([^"]*)"/)
+  if (!alt) {
+    errores.push(`Imagen sin atributo alt: ${m[0].slice(0, 90)}…`)
+  } else if (!alt[1].trim()) {
+    avisos.push(
+      `Imagen con alt vacío: ${m[0].slice(0, 90)}… Si es decorativa está bien; ` +
+        `si no, describe lo que se ve.`
+    )
+  }
+}
+
+/* --- 12. Variantes de animación que existen -------------------------
+   Un `data-anim="fade"` no da error en el navegador: el elemento aparece sin
+   movimiento y nadie se enteraría de que la secuencia está a medias. */
+const ANIMS = new Set(['subir', 'aparecer', 'escala', 'lateral'])
+for (const m of html.matchAll(/data-anim="([^"]*)"/g)) {
+  if (!ANIMS.has(m[1])) {
+    errores.push(
+      `data-anim="${m[1]}" no existe. Variantes: ${[...ANIMS].join(', ')} ` +
+        `(ver src/lib/reveal.js).`
+    )
   }
 }
 

@@ -22,6 +22,23 @@ src/components/sections/    ← cómo se ve. No se toca para poner contenido.
 cambiar «Servicios» por «Áreas de trabajo» sea editar una línea y no buscar
 por todo el proyecto.
 
+## Una idea por sección
+
+Antes de escribir nada: **cada sección tiene UNA cosa que quiere que el
+visitante entienda.** Si tiene dos, no tiene ninguna, y la respuesta es partirla
+en dos secciones (una fila más en `site-map.js`), no apretar más contenido.
+
+La cabecera que devuelve `seccion()` tiene tres niveles y están pensados para
+leerse en cascada: `eyebrow` dice dónde estoy (13px, mayúsculas), `titulo` de
+qué va (30-44px), `subtitulo` por qué me importa (18px, tenue). Úsalos los
+tres o el título queda suelto; y no metas la idea principal en el subtítulo,
+que es el que menos gente lee.
+
+Los tamaños salen todos de la escala de `tokens.css` y `npm run check` no deja
+escribir ninguno a mano. Si al rellenar una sección te dan ganas de agrandar un
+texto, casi siempre lo que falla es la jerarquía de la sección, no el tamaño.
+El porqué completo está en `referencia/acabado.md`.
+
 ## Rellenar un bloque de texto
 
 `renderBloque` — para «Quiénes somos», «Historia», «Misión y visión», «Marco
@@ -53,6 +70,10 @@ export const quienesSomos = {
   ],
 }
 ```
+
+La prosa se pinta en el tamaño de lectura (18px) y con ancho de medida: son
+los dos ajustes que hacen que un texto largo se lea de corrido. No los toques
+por sección.
 
 Sin `imagen`, el texto se centra con ancho de lectura — también queda bien, y
 es mejor que una foto de banco de imágenes que no dice nada.
@@ -97,11 +118,16 @@ Reglas que se aprendieron a base de rehacerlo:
 - **Iconos de Font Awesome 6**, con su prefijo: `fa-solid`, `fa-brands`.
   Con el prefijo de la 5 (`fas`, `fab`) el icono sale como un cuadrado vacío.
 
+Las tarjetas entran **escalonadas** solas: la rejilla lleva
+`data-anim-secuencia` y `reveal.js` calcula el retardo por la posición del
+hijo. Añadir o quitar una tarjeta no obliga a tocar nada.
+
 ## El hero
 
 Lo único que lee alguien que llega de un buscador. Tres reglas:
 
-- **Bajada de dos frases.** No tres.
+- **Bajada de dos frases.** No tres. Y no encoge en móvil: es la frase que
+  explica el negocio y el teléfono es donde más gente la lee.
 - **Dos botones.** El primero es el que de verdad quieres que pulsen; el
   segundo, la alternativa razonable. Con cuatro no destaca ninguno.
 - **`cinta` solo con cifras verificables.** Un «+500 clientes» inventado se
@@ -137,10 +163,18 @@ componente y los estilos.
 Al crear uno nuevo:
 
 1. `src/components/sections/<nombre>.js`, envolviendo con `seccion()`.
-2. Estilos en `src/styles/components.css`, con tokens, sin colores literales.
-3. Si necesita conducta, una función `init<Nombre>()` y llamarla en `main.js`.
-4. Fila en `src/site-map.js`.
-5. `npm run check`.
+2. Estilos en `src/styles/components.css`, **solo con tokens**: sin colores,
+   sin tamaños de letra y sin duraciones escritos a mano. `npm run check`
+   (puntos 8, 9 y 10) rechaza los tres, así que esto no es una recomendación.
+3. Si hay hermanos que entran juntos, `data-anim-secuencia` en el contenedor y
+   `data-anim` en cada hijo. Variantes: `subir`, `aparecer`, `escala`,
+   `lateral` — una por sección, no las cuatro.
+4. Si algo es pulsable: los cuatro estados (normal, `:hover` **dentro de**
+   `@media (hover: hover)`, `:active` fuera, `:focus-visible`), y 44px de alto
+   mínimo en el bloque `@media (pointer: coarse)` de `responsive.css`.
+5. Si necesita conducta, una función `init<Nombre>()` y llamarla en `main.js`.
+6. Fila en `src/site-map.js`.
+7. `npm run check`.
 
 ## Al terminar cada sección
 

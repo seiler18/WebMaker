@@ -151,3 +151,4 @@ contenido real antes de que exista una URL que alguien pueda abrir.
 | El menú sale vacío | Se borraron filas de `site-map.js` pero se dejó el `import` de un componente que ya no se usa → error de módulo |
 | Una sección no aparece | Su fila está en el mapa pero el `render` apunta a datos con otro `id` que el de la fila |
 | El pie no enlaza una sección | Está con `enMenu: false` — es lo esperado |
+| `check` se queja de un color, un tamaño de letra o una duración literal | Se editó el CSS a mano en vez de usar los tokens. Es la regla 5, 14 o 15 — y el andamiaje recién copiado pasa en verde, así que el literal lo acabas de escribir tú |

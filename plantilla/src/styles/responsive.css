@@ -20,6 +20,12 @@
    atendemos»), entre 992 y 1200px los enlaces caben pero quedan pegados unos a
    otros y sin aire. En ese caso, 1199.98px aquí y 1200px en shell.js. Con
    cuatro o cinco secciones cortas, 991.98 va bien.
+
+   AL FINAL de este archivo hay dos bloques que NO son de ancho sino de tipo de
+   entrada (`pointer: coarse`) y de altura de ventana. Los de ancho suponen que
+   una pantalla estrecha es un móvil, y eso es falso: una ventana estrecha en
+   un portátil tiene ratón, y una tableta de 1024px tiene dedos. Lo que se
+   pulsa con el dedo se mide con `pointer`, no con `max-width`.
    ============================================================ */
 
 @media (max-width: 991.98px) {
@@ -48,12 +54,18 @@
     /* Cerrado: plegado hacia arriba y sin poder recibir clics.
        Se usa scaleY + opacity en vez de `display:none` para que la apertura
        se pueda animar. `visibility` es lo que lo saca del tabulador: con
-       solo opacity:0 seguiría siendo enfocable. */
+       solo opacity:0 seguiría siendo enfocable.
+       La apertura usa --medio y la curva de salida: un menú que tarda --lento
+       en abrirse se siente como una página que va lenta, no como una página
+       cuidada. */
     transform-origin: top;
     transform: scaleY(0.85);
     opacity: 0;
     visibility: hidden;
-    transition: transform 0.25s ease, opacity 0.25s ease, visibility 0.25s;
+    transition:
+      transform var(--medio) var(--curva-salida),
+      opacity var(--medio) var(--curva-salida),
+      visibility var(--medio);
   }
   .topbar-nav.abierto {
     transform: none;
@@ -62,7 +74,9 @@
   }
 
   .topbar-nav > ul { flex-direction: column; align-items: stretch; gap: 0.15rem; }
-  .topbar-nav .nav-link { padding: 0.85rem 1rem; font-size: 1rem; }
+  /* En el cajón los enlaces son filas de menú, no orientación al margen: van
+     en el tamaño del cuerpo y con alto de zona pulsable. */
+  .topbar-nav .nav-link { padding: 0.85rem 1rem; font-size: var(--txt-cuerpo); }
   /* En el cajón el subrayado no tiene sentido: los enlaces son filas. */
   .topbar .nav-link::after { display: none; }
   .topbar-nav .nav-link.is-active {
@@ -79,8 +93,10 @@
   /* ============ ARMAZÓN 'sidebar': barra inferior de iconos ============ */
   body[data-armazon="sidebar"] .app-main {
     margin-left: 0;
-    /* Hueco para que la barra inferior no tape el final del pie. */
-    padding-bottom: var(--barra-movil-h);
+    /* Hueco para que la barra inferior no tape el final del pie. Incluye la
+       franja del gesto de los iPhone sin botón: sin ella el último enlace del
+       pie queda debajo de la raya y no se puede pulsar. */
+    padding-bottom: calc(var(--barra-movil-h) + env(safe-area-inset-bottom, 0px));
   }
   body[data-armazon="sidebar"] .topbar { left: 0; }
 
@@ -96,8 +112,14 @@
     right: 0;
     flex-direction: row;
     width: 100%;
-    height: var(--barra-movil-h);
-    padding: 0;
+    /* El alto crece con la franja del gesto y el relleno la reserva por
+       dentro, así que los iconos quedan centrados en la parte pulsable y no
+       debajo de la raya. `env()` vale 0 en todo lo que no sea un iPhone con
+       notch, así que el resto de teléfonos no cambia.
+       Para que `env()` NO valga cero hace falta `viewport-fit=cover` en el
+       <meta name="viewport"> de index.html. */
+    height: calc(var(--barra-movil-h) + env(safe-area-inset-bottom, 0px));
+    padding: 0 0 env(safe-area-inset-bottom, 0px);
     border-right: none;
     border-top: 1px solid var(--borde);
     box-shadow: 0 -6px 26px rgba(0, 0, 0, 0.55);
@@ -118,11 +140,11 @@
     height: 100%;
     padding: 0.3rem 0.35rem;
     border-radius: 0;
-    font-size: 0.62rem;
+    font-size: var(--txt-barra);
     text-align: center;
     line-height: 1.15;
   }
-  .sidenav .nav-link i { font-size: 1.05rem; }
+  .sidenav .nav-link i { font-size: var(--icono-medio); }
 
   /* El acento pasa de barra lateral a subrayado superior */
   .sidenav .nav-link::before {
@@ -154,22 +176,29 @@
 
 /* --- Ajustes de contenido en pantallas pequeñas --- */
 @media (max-width: 767.98px) {
-  .topbar-inner { padding: 0 1rem; }
+  /* `max()` con la franja lateral: en horizontal, sobre un teléfono con notch,
+     el borde de la pantalla se come el primer centímetro y el texto quedaba
+     debajo del recorte. En todo lo demás `env()` vale 0 y esto es 1rem. */
+  .topbar-inner { padding: 0 max(1rem, env(safe-area-inset-right)) 0 max(1rem, env(safe-area-inset-left)); }
   .marca-lema { display: none; }
 
   .hero {
     min-height: 78vh;
     padding: 3rem 1.25rem 4.5rem;
   }
-  .hero-bajada { font-size: 0.98rem; }
+  /* La bajada NO baja de tamaño en móvil: es la frase que explica el negocio y
+     el teléfono es donde más gente la lee. Lo que se recorta es el aire de
+     alrededor, no el texto. */
   /* En una pantalla corta la flecha cae encima de los botones. */
   .hero-scroll { display: none; }
+  /* Botones a lo ancho y en columna: en móvil el pulgar acierta un botón de
+     ancho completo, y el orden vertical deja clarísimo cuál es el principal. */
   .hero-acciones { flex-direction: column; align-items: stretch; }
   .hero-cinta { gap: 1.25rem; margin-top: 2rem; padding-top: 1.5rem; }
 
   .section { padding: 2.5rem 0; }
   .section + .section { padding-top: 1.5rem; }
-  .section-inner { padding: 0 1rem; }
+  .section-inner { padding: 0 max(1rem, env(safe-area-inset-right)) 0 max(1rem, env(safe-area-inset-left)); }
   .section-divider { margin-bottom: 2rem; padding: 0 1rem; }
   .section-head { margin-bottom: 1.8rem; }
 
@@ -181,4 +210,66 @@
 
   .modal-caja { max-height: calc(100vh - 2rem); }
   dialog.modal { max-height: calc(100vh - 2rem); }
+}
+
+/* ============================================================
+   ENTRADA TÁCTIL — no es una cuestión de ancho
+
+   Todo lo que se pulsa tiene que medir al menos --toque-min (44px) en la
+   dirección en la que el dedo falla. No es una recomendación de accesibilidad
+   que se pueda dejar para después: un enlace de 20px de alto en una lista de
+   enlaces se falla una de cada tres veces, y lo que el visitante concluye no
+   es «he apuntado mal», es que el sitio está mal hecho.
+
+   Va por `pointer: coarse` y no por `max-width` porque el que falla es el
+   dedo, no la pantalla: una tableta de 1024px necesita esto y una ventana
+   estrecha en un portátil con ratón, no.
+   ============================================================ */
+@media (pointer: coarse) {
+  /* Alto mínimo de botón, sin tocar el relleno horizontal. */
+  .btn,
+  .hero-btn,
+  .btn-descarga,
+  .filtro { min-height: var(--toque-min); }
+
+  /* Los enlaces de una lista (pie y redes) son los peores infractores: como
+     son texto, miden lo que mide la línea. Se les da alto propio en vez de
+     separarlos más, que solo estiraría el pie. */
+  .pie-nav a,
+  .pie-redes-lista a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--toque-min);
+  }
+  .pie-nav ul { gap: 0; }
+
+  .sidenav-social a,
+  .modal-cerrar {
+    width: var(--toque-min);
+    height: var(--toque-min);
+  }
+
+  /* 16px COMO MÍNIMO en los campos del formulario. Safari de iOS hace zoom
+     automáticamente al enfocar un campo con letra más pequeña, y el zoom deja
+     el formulario a medio encuadre y no se deshace solo: el visitante escribe
+     su correo mirando media pantalla. Es el detalle que más «se nota» de todo
+     este bloque y el que nadie ve desde un escritorio. */
+  .campo input,
+  .campo select,
+  .campo textarea { font-size: var(--txt-cuerpo); }
+}
+
+/* ============================================================
+   VENTANAS BAJAS — teléfono en horizontal
+
+   Un teléfono girado deja unos 380px de alto. Una portada de 78vh con
+   `min-height` y relleno generoso se convierte ahí en una pantalla entera de
+   aire con un título en medio, y la primera sección no se intuye.
+   ============================================================ */
+@media (max-height: 520px) and (orientation: landscape) {
+  .hero {
+    min-height: 0;
+    padding: 2.5rem 1.25rem 3rem;
+  }
+  .hero-cinta { margin-top: 1.5rem; padding-top: 1rem; }
 }

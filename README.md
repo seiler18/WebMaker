@@ -44,8 +44,10 @@ probó y salió mal», documentado en
    ② definir-identidad      paleta, tipografía, armazón
    ③ generar-andamiaje      materializa la plantilla, deja el check en verde
    ④ construir-secciones    una sección por vez, desde el briefing
-   ⑤ publicar-sitio         repo, GitHub Pages, verificación
-   ⑥ registrar-hito         memoria, en el proyecto hijo
+   ⑤ pulir-acabado          jerarquía, tipografía, interacción, revelado,
+                            detalle y móvil — y el guion de revisión visual
+   ⑥ publicar-sitio         repo, GitHub Pages, verificación
+   ⑦ registrar-hito         memoria, en el proyecto hijo
 ```
 
 **La regla que gobierna todo lo demás:** primero el briefing, después el
@@ -59,9 +61,9 @@ aparece el primer dato real; uno construido desde un briefing se ajusta.
 ```
 WebMaker/
 ├── CLAUDE.md              el orquestador: el recorrido y las reglas
-├── skills/                7 procedimientos, uno por paso
-├── plantilla/             26 archivos: un sitio Vite 8 que ya funciona
-├── referencia/            arquitectura · trampas · paletas · catálogo
+├── skills/                8 procedimientos, uno por paso
+├── plantilla/             38 archivos: un sitio Vite 8 que ya funciona
+├── referencia/            arquitectura · acabado · trampas · paletas · catálogo
 └── hitos/                 qué se decidió y contra qué
 ```
 
@@ -81,14 +83,18 @@ Un sitio de una sola página, listo para publicar en GitHub Pages:
 - **Formulario de contacto sin backend**: correo vía FormSubmit o WhatsApp con
   el mensaje ya armado. Sin credenciales, porque GitHub Pages sirve todo en
   claro.
-- **Verificador de integridad** (`npm run check`) con siete comprobaciones, y
-  va **dentro** de `npm run build`: un fallo rompe el deploy en vez de llegar
-  a producción.
+- **Sistema de acabado en tokens**: una paleta, diez pasos tipográficos con un
+  papel cada uno, tres duraciones y tres curvas. Cambiar la identidad del sitio
+  es editar un bloque, y el resto del CSS no puede salirse del sistema porque
+  el verificador lo rechaza.
+- **Verificador** (`npm run check`) con doce comprobaciones —siete de
+  integridad y cinco de acabado—, y va **dentro** de `npm run build`: un fallo
+  rompe el deploy en vez de llegar a producción.
 - **Deploy automático** a GitHub Pages por Actions.
 
 ### El verificador
 
-Siete cosas que un build correcto no detecta:
+Doce cosas que un build correcto no detecta:
 
 | # | Comprueba | Por qué |
 |---|---|---|
@@ -99,6 +105,16 @@ Siete cosas que un build correcto no detecta:
 | 5 | Archivos referenciados que no existen | Vite no valida rutas dentro de strings de HTML |
 | 6 | `base` de Vite vs. URL de producción | El error más silencioso de Pages: carga sin estilos |
 | 7 | Anclas huérfanas | Enlaces de menú que no llevan a ningún sitio |
+| 8 | Colores literales fuera de `tokens.css` | Al cambiar de paleta sobrevive el azul anterior |
+| 9 | Tamaños de letra literales | Veintidós tamaños no se ven variados, se ven hechos a ojo |
+| 10 | Duraciones y curvas literales | Dos fichas vecinas que responden distinto se leen como algo sin terminar |
+| 11 | Imágenes sin `alt` | Es lo que se lee en voz alta y lo que se ve si la imagen no carga |
+| 12 | Variantes de animación que no existen | Un `data-anim` mal escrito no da error: deja la secuencia a medias |
+
+Los cinco últimos existen porque esas reglas **estaban escritas desde el primer
+día y se rompieron igual**: romperlas no falla en ninguna parte, se ve meses
+después en una revisión visual. Una regla de acabado que no se comprueba es una
+intención.
 
 ---
 
@@ -108,7 +124,7 @@ Siete cosas que un build correcto no detecta:
 |---|---|
 | Bootstrap, jQuery, Popper | Buena parte de los hitos del sitio original son arreglos de esas dependencias: modal por debajo de la barra, `.card-deck` descuadrado, viñetas colándose en el menú |
 | Carrusel | Costó tres hitos —alto que saltaba, flechas que se comían el clic del botón, maqueta rota en móvil. Una rejilla `auto-fill` no tiene ninguno de esos problemas |
-| Librería de animación | 40 líneas con `IntersectionObserver` hacen lo único que se usaba |
+| Librería de animación | 80 líneas con `IntersectionObserver` hacen lo único que se usaba, escalonado incluido |
 | Librería de modales | `<dialog>` nativo da el foco atrapado, Escape y fondo inerte gratis |
 
 Resultado: un sitio de cuatro secciones son **~19 KB de JS y ~22 KB de CSS**,
@@ -133,7 +149,7 @@ El punto de entrada es
 ```bash
 # ya dentro del proyecto generado
 npm install
-npm run check      # integridad: rutas, ids, marcadores, base, anclas
+npm run check      # integridad + acabado (12 comprobaciones)
 npm run build      # check + vite build + copy-assets
 npm run preview    # único modo que reproduce las rutas de producción
 ```
@@ -145,9 +161,9 @@ que se copia, no comandos de un proyecto.
 ### Lo que hereda cada sitio generado
 
 Un proyecto que se gobierna solo: su propio `CLAUDE.md`, sus `.claude/hitos/`
-y cinco skills (`editar-contenido`, `agregar-seccion`, `desplegar`,
-`optimizar-imagenes`, `registrar-hito`). Después de publicarlo, WebMaker ya no
-hace falta para mantenerlo.
+y seis skills (`editar-contenido`, `agregar-seccion`, `revisar-acabado`,
+`desplegar`, `optimizar-imagenes`, `registrar-hito`). Después de publicarlo,
+WebMaker ya no hace falta para mantenerlo.
 
 ---
 
@@ -166,13 +182,17 @@ una vez.
 ## Estado
 
 La plantilla está **verificada**: instalación limpia sin vulnerabilidades,
-`npm run check` en verde con cuatro pruebas negativas que se detectan
-correctamente, build correcto en los dos armazones, y `preview` sirviendo
-index, CSS, JS e imágenes con 200.
+`npm run check` en verde sobre una materialización de prueba, `npm run build`
+correcto, y `preview` sirviendo index, CSS, JS e imágenes con 200. Las doce
+comprobaciones del verificador tienen prueba negativa: se inyecta la infracción
+y se confirma que sale con código 1.
 
 Lo que todavía **no** está probado: el aspecto. Aquí no hay navegador
-automatizado — se comprobó que compila y sirve, no que se ve bien. La primera
-pasada visual llega con el primer sitio real.
+automatizado — se comprobó que compila y sirve, no que se ve bien. Del sistema
+de acabado, lo que solo se puede confirmar en un teléfono real (la franja del
+gesto en iPhone, el zoom de Safari al enfocar un campo, si el escalonado se
+siente o se sufre) está **pendiente de la primera revisión visual**, y por eso
+`skills/pulir-acabado/SKILL.md` lleva el guion de preguntas para pedirla.
 
 Las recetas de [`referencia/catalogo-secciones.md`](referencia/catalogo-secciones.md)
 (línea de tiempo, preguntas frecuentes, tabla comparativa, galería) están
