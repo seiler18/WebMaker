@@ -34,6 +34,42 @@
   --brillo:        rgba(37, 99, 235, 0.25);
   --brillo-acento: rgba(34, 211, 238, 0.45);
 
+  /* ----- Color: DERIVADOS -----
+     NO SE TOCAN AL CAMBIAR DE PALETA. Salen con `color-mix()` de los colores
+     de arriba, así que cambian solos: una paleta nueva solo tiene que definir
+     los tokens base y estos se recalculan.
+
+     Existen porque en el primer sitio hecho con esta plantilla estos siete
+     colores estaban escritos a mano como `rgba(37, 99, 235, …)` dentro de
+     components.css, layout.css y responsive.css. Al cambiar la identidad del
+     sitio, el icono de las tarjetas y la barra de navegación se quedaron con
+     el azul de la paleta ANTERIOR — y nadie lo vio hasta la revisión visual.
+     Si necesitas un lavado que no está, añádelo aquí con color-mix; no lo
+     escribas en el componente. */
+
+  /* Lavados del primario: fondo del enlace activo, icono de tarjeta. */
+  --primario-tenue:        color-mix(in srgb, var(--primario) 16%, transparent);
+  --primario-tenue-fuerte: color-mix(in srgb, var(--primario) 26%, transparent);
+
+  /* Fondo de una ficha con el puntero encima: un punto más claro que
+     --surface, lo justo para que se note que responde. */
+  --superficie-viva:  color-mix(in srgb, var(--surface) 92%, #ffffff);
+
+  /* Fondos translúcidos. Llevan alfa porque encima tienen
+     `backdrop-filter: blur`: un color opaco anularía el difuminado. */
+  --barra-fondo:       color-mix(in srgb, var(--bg) 82%, transparent);
+  --barra-fondo-opaca: color-mix(in srgb, var(--bg) 97%, transparent);
+  --velo:              color-mix(in srgb, var(--bg) 55%, transparent);
+  --superficie-velada: color-mix(in srgb, var(--bg-2) 60%, transparent);
+
+  /* Luces del fondo en movimiento (portada y halos de página). Bastante más
+     opacas que --brillo y --brillo-acento: una luz casi transparente se
+     desplaza sin que nadie lo perciba, y el fondo parece estático. Los tenues
+     siguen para bordes, sombras e iconos, donde deben ser discretos. */
+  --brillo-movil:        color-mix(in srgb, var(--primario) 42%, transparent);
+  --brillo-movil-acento: color-mix(in srgb, var(--acento) 30%, transparent);
+  --brillo-movil-frio:   color-mix(in srgb, var(--primario-claro) 24%, transparent);
+
   /* ----- Color: estados ----- */
   --ok:            #34d399;
   --error:         #f87171;

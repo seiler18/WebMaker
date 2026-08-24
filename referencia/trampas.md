@@ -1,9 +1,13 @@
 # Trampas conocidas
 
 Errores ya cometidos, con su causa y su arreglo. Destilado de los catorce
-hitos del sitio de currículum. Cada uno costó al menos una tarde.
+hitos del sitio de currículum, más lo aprendido en el primer sitio de cliente
+(CEDER SpA, hito [0002](../hitos/0002-correcciones-del-primer-sitio-de-cliente.md)).
 
-Ordenados por lo que más veces ha roto un sitio.
+Ordenados por lo que más veces ha roto un sitio. **De la 16 a la 21 son las
+del primer sitio de cliente: todas salieron en la revisión visual, no del
+código.** Esa es la señal de que estas son las que más caro se pagan: el
+verificador no las ve.
 
 ---
 
@@ -207,6 +211,155 @@ build` y códigos HTTP sobre `npm run preview` prueban que **funciona**, no que
 **Arreglo:** pedir la pasada visual y decir explícitamente qué se comprobó y
 qué no. Es la diferencia entre un informe útil y uno que hay que verificar
 igual.
+
+---
+
+## 16. Colores literales que sobreviven al cambio de paleta
+
+**Síntoma:** se cambia la paleta y el sitio queda casi bien, pero el icono de
+las tarjetas y el fondo del enlace activo del menú siguen con el azul de
+antes. La barra de navegación se ve más azul que el resto de la página.
+
+**Causa:** la plantilla tenía siete `rgba(37, 99, 235, …)` y
+`rgba(10, 14, 26, …)` escritos a mano en `components.css`, `layout.css` y
+`responsive.css` — el primario y el fondo de la paleta de fábrica. Al cambiar
+`tokens.css` esos valores no se enteran. Es la regla 5 del `CLAUDE.md`
+incumplida por la propia plantilla.
+
+**Arreglo (ya en la plantilla):** son tokens derivados con `color-mix()` a
+partir de `--primario`, `--bg`, `--bg-2` y `--surface`, así que cambian solos
+con la paleta: `--primario-tenue`, `--primario-tenue-fuerte`,
+`--superficie-viva`, `--barra-fondo`, `--barra-fondo-opaca`, `--velo`,
+`--superficie-velada`. **Si necesitas un lavado nuevo, añádelo ahí con
+color-mix; no lo escribas en el componente.**
+
+Para cazarlos en cualquier sitio:
+
+```bash
+grep -rn "rgba([0-9]" src/styles/ | grep -v tokens.css | grep -vE "rgba\((0|255), *(0|255)"
+```
+
+Blancos y negros neutros (`rgba(255,255,255,…)`, `rgba(0,0,0,…)`) son
+legítimos: no pertenecen a ninguna paleta.
+
+---
+
+## 17. `text-shadow` sobre un texto con `background-clip: text`
+
+**Síntoma:** se le quiere dar contorno a un título de degradado y la sombra se
+ve **por dentro** de las letras, como suciedad, en vez de rodearlas.
+
+**Causa:** `.hero-titulo` y `.section-title` usan
+`-webkit-text-fill-color: transparent`, así que el glifo **no tiene relleno**.
+Una `text-shadow` se pinta debajo del texto y, al no haber relleno que la
+tape, se ve a través.
+
+**Arreglo:** `filter: drop-shadow(...)`, que actúa sobre el resultado ya
+recortado y dibuja el borde por fuera. Dos capas funcionan mejor que una: una
+pegada al trazo define el borde, otra abierta da profundidad.
+
+```css
+filter: drop-shadow(0 0 1px rgba(0,0,0,0.95)) drop-shadow(0 2px 4px rgba(0,0,0,0.75));
+```
+
+En un texto normal (con relleno), `text-shadow` es lo correcto. La diferencia
+es si hay relleno o no.
+
+---
+
+## 18. El fondo del hero se corta en una línea recta
+
+**Síntoma:** se ve una franja horizontal separando la portada de la primera
+sección, como si fueran dos páginas pegadas.
+
+**Causa:** `.hero` tiene `overflow: hidden` y su fondo (luces y rejilla)
+termina exactamente en el borde inferior. Ese canto se lee como una línea.
+
+**Arreglo (ya en la plantilla):** una máscara de desvanecido en `.hero-fondo`:
+
+```css
+mask-image: linear-gradient(to bottom, #000 0%, #000 58%, transparent 100%);
+```
+
+Dos detalles que importan:
+
+- **Va en el contenedor, no en los pseudo-elementos.** El `::before` y el
+  `::after` llevan `transform` animado; una máscara puesta ahí se movería con
+  la animación y el punto de desvanecido bailaría.
+- **Se desvanece a `transparent`, no a `var(--bg)`.** El fondo de la página no
+  es `--bg` puro (tiene los halos de `body::before` encima), así que un
+  degradado hacia `--bg` deja una banda oscura visible justo donde querías
+  quitar una línea.
+
+`mask` crea contexto de apilamiento: ahí es inofensivo, pero no la subas a un
+ancestro del modal (trampa 4).
+
+---
+
+## 19. Un fondo animado que no se percibe
+
+**Síntoma:** hay animación en el fondo, el `will-change` está puesto, y el
+cliente dice que el fondo está quieto.
+
+**Causa:** dos cosas a la vez. Las luces usaban los brillos tenues
+(`--brillo`, alfa 0.20-0.25): una luz casi transparente se desplaza sin que se
+note. Y estaban solo en la mitad superior, así que al bajar no había nada
+moviéndose.
+
+**Arreglo:** tokens aparte para esto (`--brillo-movil`,
+`--brillo-movil-acento`, `--brillo-movil-frio`, alfa 0.24-0.42) y **un tercer
+foco abajo**. No subas `--brillo`: ese token también alimenta bordes, sombras
+de tarjeta y brillos de icono, donde tiene que seguir siendo discreto.
+
+Y una regla de oficio: **el ciclo corto se nota, el largo no existe.** 15-22s
+funciona; 40s es lo mismo que estático.
+
+**Un patrón repetido se anima con `background-position`, no con `transform`.**
+La rejilla se repite cada 54px: desplazarla exactamente 54px deja el dibujo
+idéntico y el bucle es invisible. Con `transform` se movería también su máscara
+y se vería entrar el borde del recuadro. Y en `linear`: una rejilla que acelera
+y frena se lee como un fallo de rendimiento.
+
+---
+
+## 20. El menú de la barra superior se parte en dos líneas
+
+**Síntoma:** con cinco o seis secciones, la barra crece al doble de alto y los
+enlaces se reparten en dos filas.
+
+**Causa:** dos, y hay que arreglar las dos:
+
+1. `.nav-link` sin `white-space: nowrap` — una etiqueta de dos palabras se
+   parte por dentro antes incluso de que el menú desborde.
+2. El **lema de la marca**, que se lleva unos 250px de los 1180 del
+   contenedor. Y encima sale cortado con puntos suspensivos, que se ve peor
+   que no ponerlo.
+
+**Arreglo (ya en la plantilla):** `nowrap` en el enlace y en la lista, y el
+lema oculto en el armazón `topbar` (se lee entero en la portada, que es su
+sitio). En `sidebar` hay una columna para él y se conserva.
+
+**Lo que NO hay que hacer:** acortar las etiquetas del menú. Dicen qué hay en
+cada sección, y en un sitio institucional el visitante no tiene que adivinar.
+Tampoco subir `--ancho-max`: cambiarías el ancho de lectura de todo el sitio
+para arreglar la barra.
+
+---
+
+## 21. El breakpoint del armazón vive en dos archivos
+
+**Síntoma:** hay una franja de anchos en la que el cajón del menú se queda
+abierto con los estilos de escritorio ya aplicados, y el menú aparece a medio
+camino.
+
+**Causa:** el ancho está en `styles/responsive.css` (`@media`) **y** en
+`components/shell.js` (`matchMedia`, que cierra el cajón al volver a
+escritorio). Se cambió uno y no el otro.
+
+**Arreglo:** cambiar siempre los dos. Están comentados el uno al otro. Y el
+criterio para moverlo: con **seis o más secciones de etiqueta larga**, entre
+992 y 1200px los enlaces caben pero quedan sin aire, así que conviene subirlo
+a 1199.98 / 1200. Con cuatro o cinco secciones cortas, 991.98 va bien.
 
 ---
 

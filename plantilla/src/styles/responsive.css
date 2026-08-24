@@ -10,6 +10,16 @@
 
      'topbar'   → los enlaces se esconden en un cajón desplegable
      'sidebar'  → la columna se convierte en barra inferior de iconos
+
+   ESTE ANCHO VA EN PAREJA con el `matchMedia` de src/components/shell.js, que
+   cierra el cajón al volver a escritorio. Si cambias uno sin el otro, queda
+   una franja de anchos en la que el cajón sigue abierto con los estilos de
+   escritorio ya aplicados, y el menú aparece a medio camino.
+
+   CUÁNDO SUBIRLO: con seis o más secciones de etiqueta larga («A quién
+   atendemos»), entre 992 y 1200px los enlaces caben pero quedan pegados unos a
+   otros y sin aire. En ese caso, 1199.98px aquí y 1200px en shell.js. Con
+   cuatro o cinco secciones cortas, 991.98 va bien.
    ============================================================ */
 
 @media (max-width: 991.98px) {
@@ -28,7 +38,7 @@
     gap: 0;
     max-height: calc(100vh - var(--topbar-h));
     padding: 0.75rem 1rem 1.25rem;
-    background: rgba(10, 14, 26, 0.97);
+    background: var(--barra-fondo-opaca);
     -webkit-backdrop-filter: blur(16px);
     backdrop-filter: blur(16px);
     border-bottom: 1px solid var(--borde);
@@ -124,7 +134,7 @@
     transform: translateX(-50%) scaleX(0);
   }
   .sidenav .nav-link.is-active::before { transform: translateX(-50%) scaleX(1); }
-  .sidenav .nav-link.is-active { background: rgba(37, 99, 235, 0.18); }
+  .sidenav .nav-link.is-active { background: var(--primario-tenue); }
 
   /* Etiquetas: la larga se va, la corta aparece */
   body[data-armazon="sidebar"] .sidenav .nav-largo { display: none; }

@@ -44,6 +44,18 @@ Lo que no se negocia, sea cual sea la paleta:
 - **Un solo acento.** Dos colores de acento compitiendo dejan la página sin
   jerarquía: deja de saberse qué es lo importante.
 
+**Cambiar la paleta es sustituir el bloque de color base y nada más.** Los
+tokens derivados (`--primario-tenue`, `--superficie-viva`, `--barra-fondo`,
+`--velo`, `--superficie-velada`, los `--brillo-movil*`) salen con `color-mix()`
+de esos colores y se recalculan solos: no los copies ni los edites. Si hace
+falta un lavado nuevo, se añade a ese mismo bloque.
+
+**Si eliges Papel Claro**, la única en claro, lee la advertencia al pie de
+`referencia/paletas.md` antes de prometer plazos: hay cuatro cosas que ajustar
+a mano —las luces animadas del fondo, los contornos oscuros de los títulos, los
+degradados de texto y `--superficie-viva`— y **ninguna la detecta
+`npm run check`**. Cuenta una hora, no dos minutos.
+
 ## Decisión 3 — Tipografía
 
 Dos familias como máximo (títulos y texto). Tres se leen como un collage.

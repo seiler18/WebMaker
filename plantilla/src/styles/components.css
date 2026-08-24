@@ -40,12 +40,69 @@
   position: absolute;
   inset: 0;
   z-index: -1;
-  background:
-    radial-gradient(680px circle at 22% 25%, var(--brillo), transparent 60%),
-    radial-gradient(520px circle at 80% 70%, var(--brillo-acento), transparent 55%);
-  /* Rejilla técnica muy tenue. Da textura sin competir con el texto. */
   background-color: transparent;
+
+  /* DESVANECIDO INFERIOR. No es decoración: sin esto se ve una LÍNEA RECTA
+     separando la portada de la primera sección.
+     El .hero tiene `overflow: hidden`, así que las luces y la rejilla se
+     cortan en seco en su borde inferior, y ese canto se lee como una franja
+     que parte la página en dos zonas.
+     La máscara va AQUÍ, en el contenedor, y no en cada pseudo-elemento, por
+     dos razones: recorta de una vez todo lo que pintan el ::before y el
+     ::after, y esta caja mide exactamente lo que mide el hero y NO SE MUEVE —
+     las de los pseudos llevan `transform`, así que el punto de desvanecido
+     bailaría con la animación.
+     Del 58% al 100% el fondo se apaga hasta transparente, de modo que a los
+     dos lados del canto hay exactamente el mismo color.
+     Cuidado: `mask` crea un contexto de apilamiento. Aquí es inofensivo (es un
+     div de fondo, sin contenido interactivo), pero no la muevas a un ancestro
+     del modal — referencia/trampas.md, punto 4. */
+  mask-image: linear-gradient(to bottom, #000 0%, #000 58%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 58%, transparent 100%);
 }
+
+/* LUCES EN MOVIMIENTO.
+   Van en su propio pseudo-elemento, y no en el `background` del .hero-fondo,
+   para animarlas con `transform`: lo mueve el compositor y no repinta los
+   degradados en cada fotograma.
+
+   El pseudo es más grande que el hero (`inset: -30%`) para que al desplazarse
+   no aparezca ningún borde vacío.
+
+   Tres focos y con los brillos intensos (--brillo-movil*): con dos focos y los
+   brillos tenues el movimiento existe pero NO SE PERCIBE, que es lo mismo que
+   no tenerlo. El tercero, abajo, es el que mueve la mitad inferior.
+
+   Se detiene solo con `prefers-reduced-motion` (regla global en base.css). */
+.hero-fondo::before {
+  content: "";
+  position: absolute;
+  inset: -30%;
+  background:
+    radial-gradient(680px circle at 22% 25%, var(--brillo-movil), transparent 62%),
+    radial-gradient(560px circle at 80% 68%, var(--brillo-movil-acento), transparent 58%),
+    radial-gradient(620px circle at 45% 95%, var(--brillo-movil-frio), transparent 60%);
+  animation: luces-hero 15s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+/* Recorrido amplio a propósito. Si se sube mucho más, el borde del pseudo
+   entra en cuadro incluso con el `inset: -30%`. */
+@keyframes luces-hero {
+  0%   { transform: translate3d(-7%, -5%, 0) scale(1); }
+  35%  { transform: translate3d(6%, 3%, 0) scale(1.16); }
+  70%  { transform: translate3d(9%, 8%, 0) scale(1.08); }
+  100% { transform: translate3d(-4%, 9%, 0) scale(1.22); }
+}
+
+/* REJILLA TÉCNICA. Da textura sin competir con el texto, y deriva despacio.
+   Se anima `background-position` y NO `transform`: la rejilla es un patrón que
+   se repite cada 54px, así que desplazarlo exactamente 54px deja el dibujo
+   igual que al empezar y el bucle es invisible. Con `transform` se movería
+   también su máscara radial y se vería entrar el borde del recuadro.
+   `linear` y no `ease`: una rejilla que acelera y frena se lee como un fallo
+   de rendimiento. Cada capa (horizontales y verticales) necesita su propia
+   posición, de ahí los dos valores separados por coma. */
 .hero-fondo::after {
   content: "";
   position: absolute;
@@ -56,6 +113,12 @@
   background-size: 54px 54px;
   mask-image: radial-gradient(circle at 50% 40%, #000 30%, transparent 75%);
   -webkit-mask-image: radial-gradient(circle at 50% 40%, #000 30%, transparent 75%);
+  animation: rejilla-deriva 22s linear infinite;
+}
+
+@keyframes rejilla-deriva {
+  from { background-position: 0 0, 0 0; }
+  to   { background-position: 54px 54px, 54px 54px; }
 }
 
 .hero-contenido { max-width: 900px; }
@@ -71,16 +134,28 @@
 .hero-titulo {
   margin: 0;
   font-size: clamp(2.4rem, 7vw, 4.4rem);
-  background: var(--degradado-texto);
+  /* Arranca en blanco, no en el primario claro: el título cae justo encima de
+     las luces del fondo y con el degradado de los títulos de sección se
+     fundía con ellas. */
+  background: linear-gradient(160deg, #ffffff 0%, var(--primario-claro) 55%, var(--acento) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
+  /* CONTORNO — tiene que ser `filter: drop-shadow`, NO `text-shadow`.
+     Ver la explicación completa en .section-title (layout.css): con
+     `-webkit-text-fill-color: transparent` el glifo no tiene relleno y una
+     text-shadow se ve atravesando la letra. */
+  filter:
+    drop-shadow(0 0 2px rgba(0, 0, 0, 0.95))
+    drop-shadow(0 4px 12px rgba(0, 0, 0, 0.7));
 }
 .hero-lema {
   margin: 0.6rem 0 0;
   font-size: clamp(1rem, 2.4vw, 1.35rem);
   font-weight: 700;
   color: var(--primario-claro);
+  /* Este sí lleva relleno, así que aquí `text-shadow` es lo correcto. */
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
 }
 .hero-bajada {
   max-width: 640px;
@@ -172,7 +247,7 @@
 }
 .btn.fantasma,
 .hero-btn.fantasma {
-  background: rgba(13, 17, 28, 0.6);
+  background: var(--superficie-velada);
   border: 1px solid var(--borde-vivo);
   color: var(--acento);
 }
@@ -207,7 +282,7 @@
   padding: 0.5rem 0.9rem;
   border: 1px solid var(--borde-vivo);
   border-radius: var(--radio-sm);
-  background: rgba(13, 17, 28, 0.6);
+  background: var(--superficie-velada);
   color: var(--texto);
   font-size: 0.82rem;
   font-weight: 700;
@@ -294,12 +369,58 @@
   background: var(--surface);
   border: 1px solid var(--borde);
   border-radius: var(--radio);
-  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
 }
-.tarjeta:hover {
-  transform: translateY(-5px);
+
+/* ----------------------- HOVER COMÚN DE TODAS LAS FICHAS -----------------------
+   UNA SOLA REGLA para los dos componentes que presentan fichas: las tarjetas
+   de una rejilla (.tarjeta) y los destacados de un bloque (.destacado).
+
+   En el primer sitio hecho con esta plantilla solo reaccionaban las tarjetas,
+   así que la mitad de las fichas del sitio parecía interactiva y la otra mitad
+   no. El cliente lo notó antes que nadie.
+
+   Están juntas a propósito: si el hover de una se retoca, se retoca el de
+   todas. Separarlas es exactamente cómo se llega a que dos rejillas del mismo
+   sitio se comporten distinto. */
+.tarjeta,
+.destacado {
+  transition:
+    transform 0.28s ease,
+    box-shadow 0.28s ease,
+    border-color 0.28s ease,
+    background-color 0.28s ease;
+}
+
+.tarjeta:hover,
+.destacado:hover {
+  transform: translateY(-6px);
   border-color: var(--borde-vivo);
-  box-shadow: 0 14px 40px var(--brillo);
+  background-color: var(--superficie-viva);
+  /* La sombra negra hace el trabajo de despegar la ficha del fondo; `--brillo`
+     a secas queda casi invisible sobre un fondo oscuro. El borde interior
+     remata el contorno sin mover el layout (un `border` más grueso sí lo
+     movería). */
+  box-shadow:
+    0 18px 44px rgba(0, 0, 0, 0.45),
+    0 0 0 1px var(--borde-vivo) inset,
+    0 10px 30px var(--brillo);
+}
+
+/* El icono acompaña: sin esto el movimiento se siente solo en el marco. */
+.tarjeta:hover .tarjeta-icono,
+.destacado:hover i {
+  transform: scale(1.06);
+  filter: drop-shadow(0 0 14px var(--brillo-acento));
+}
+.tarjeta-icono,
+.destacado i { transition: transform 0.28s ease, filter 0.28s ease; }
+
+/* El teclado tiene que ver lo mismo que el ratón: una ficha con enlace recibe
+   foco y sin esto no pasaba nada visible. */
+.tarjeta:focus-within,
+.destacado:focus-within {
+  border-color: var(--borde-vivo);
+  background-color: var(--superficie-viva);
 }
 /* El filtro usa el atributo `hidden`; sin esto el `display: flex` de arriba
    ganaría en especificidad y la tarjeta oculta seguiría viéndose. */
@@ -317,7 +438,7 @@
   height: 56px;
   margin: 1.25rem 1.25rem 0;
   border-radius: var(--radio-sm);
-  background: rgba(37, 99, 235, 0.14);
+  background: var(--primario-tenue);
   border: 1px solid var(--borde);
 }
 .tarjeta-icono i {
@@ -355,7 +476,7 @@
   padding: 0.5rem 1rem;
   border: 1px solid var(--borde);
   border-radius: 999px;
-  background: rgba(17, 24, 39, 0.6);
+  background: var(--superficie-velada);
   color: var(--texto-tenue);
   font-family: inherit;
   font-size: 0.86rem;
@@ -366,7 +487,7 @@
 .filtro:hover { color: var(--texto-fuerte); border-color: var(--borde-vivo); }
 .filtro.is-active {
   color: var(--texto-fuerte);
-  background: rgba(37, 99, 235, 0.22);
+  background: var(--primario-tenue-fuerte);
   border-color: var(--acento);
   box-shadow: 0 0 16px var(--brillo);
 }
@@ -499,7 +620,7 @@
   margin-top: 4rem;
   padding-top: 3rem;
   border-top: 1px solid var(--borde);
-  background: rgba(10, 14, 26, 0.5);
+  background: var(--velo);
 }
 .pie-inner {
   display: grid;

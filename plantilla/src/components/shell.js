@@ -157,6 +157,11 @@ export function initShell() {
 
   // Al pasar a escritorio el cajón deja de tener sentido: si quedó abierto,
   // sus estilos de móvil ya no aplican y el menú aparecería a medio camino.
+  //
+  // ESTE ANCHO VA EN PAREJA con el @media de styles/responsive.css (991.98px),
+  // que es donde se explica cuándo conviene subirlo. Si cambias uno sin el
+  // otro, queda una franja de anchos con el cajón abierto y los estilos de
+  // escritorio aplicados.
   window.matchMedia('(min-width: 992px)').addEventListener('change', e => {
     if (e.matches) cerrar()
   })

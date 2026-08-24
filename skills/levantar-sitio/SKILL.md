@@ -77,7 +77,9 @@ y qué quedó pendiente.
 | Imagen que se ve en local y da 404 publicada | Mayúsculas del nombre | GitHub Pages distingue, Windows no. Renombra copiando el nombre con `ls` |
 | Imagen que no aparece ni en local | No está declarada en `scripts/copy-assets.js` | Vite no ve las rutas dentro de strings de HTML |
 | El formulario dice «pendiente de confirmación» | FormSubmit no tiene el buzón validado | Es lo normal la primera vez. Hay que aceptar el correo que llega |
-| El menú móvil se queda abierto al pasar a escritorio | — | Ya está resuelto en `initShell()`. Si lo tocaste, mira ahí |
+| El menú móvil se queda abierto al pasar a escritorio | El `@media` de `responsive.css` y el `matchMedia` de `shell.js` no hablan del mismo ancho | Cambiar **los dos**. `referencia/trampas.md` 21 |
+| El menú de escritorio ocupa dos líneas | Etiquetas largas + el lema de la marca comiendo espacio | Ya resuelto en la plantilla. Si vuelve, `trampas.md` 20 |
+| Una franja recta separa la portada de la primera sección | Se tocó la máscara de `.hero-fondo` | `trampas.md` 18 |
 | `npm install` falla por SSL | Proxy corporativo | `npm config set strict-ssl false` |
 
 ## Qué se puede prometer y qué no
@@ -93,6 +95,30 @@ Lo que **no** se puede afirmar sin que lo mire el usuario: que se ve bien.
 Alineaciones, saltos de línea de los títulos, si una foto queda recortada
 donde importa, cómo se siente en un celular real. Pídele esa pasada y dilo
 claramente en vez de darlo por bueno.
+
+## Lo que el cliente comenta en la primera revisión
+
+Del primer sitio de cliente (CEDER SpA) salieron seis observaciones y **las
+seis eran visuales**: ninguna la habría detectado `npm run check`. Todas están
+ya resueltas en la plantilla, pero conviene mirarlas antes de entregar, porque
+son justo lo que se ve en los dos primeros segundos:
+
+- **¿El menú cabe en una línea?** Con cinco o seis secciones de etiqueta larga,
+  míralo en un portátil de 1366px, no solo en tu monitor. `trampas.md` 20.
+- **¿Se ve un canto recto entre la portada y la primera sección?** Entonces la
+  máscara de `.hero-fondo` se ha tocado. `trampas.md` 18.
+- **¿El fondo se mueve de verdad?** Si hay que fijarse para notarlo, no se
+  mueve. `trampas.md` 19.
+- **¿Los títulos se leen sobre el fondo?** Los de degradado necesitan su
+  contorno `drop-shadow`. `trampas.md` 17.
+- **¿Reaccionan al puntero TODAS las fichas?** Tarjetas y destacados.
+- **¿Sobra texto?** Tres párrafos densos en «Quiénes somos» se saltan. Dos
+  cortos, con los datos repartidos en los destacados, se leen.
+
+Y una que no es estética pero salió en la misma tanda: **¿el sitio se limita a
+una zona sin querer?** Una frase como «con base en <ciudad>» en la portada se
+lee como el límite del área de trabajo del cliente. El domicilio es un dato de
+Contacto, etiquetado como tal — y si atiende a todo el país, hay que decirlo.
 
 ## Si el proyecto ya tiene sitio
 

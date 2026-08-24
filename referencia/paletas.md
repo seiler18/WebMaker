@@ -10,6 +10,15 @@ fondo. Si aclaras los fondos por tu cuenta, vuelve a comprobarlo.
 **Si el cliente tiene logo, la paleta sale del logo**, no de aquí. Estas son
 para cuando no hay marca previa o el usuario dice «elige tú».
 
+> **Los tokens DERIVADOS no se copian aquí, y no hay que tocarlos.**
+> `--primario-tenue`, `--superficie-viva`, `--barra-fondo`,
+> `--barra-fondo-opaca`, `--velo`, `--superficie-velada` y los
+> `--brillo-movil*` salen con `color-mix()` de los colores de abajo, así que se
+> recalculan solos al cambiar de paleta. Viven en su propio bloque de
+> `tokens.css`. Si necesitas un lavado que no está, **añádelo a ese bloque con
+> color-mix**: escribirlo en el componente es la trampa 16 de
+> `referencia/trampas.md`, y ya costó una revisión visual.
+
 ---
 
 ## Tech Corporate (la de fábrica)
@@ -116,11 +125,25 @@ serio — pasa, y es un motivo legítimo.
 --brillo: rgba(29,78,216,0.12);       --brillo-acento: rgba(14,116,144,0.18);
 ```
 
-> **Ojo con esta:** la plantilla está pensada en oscuro. Al cambiar a claro
-> hay que revisar dos cosas concretas: el `background-image` de halos del
-> `body` en `base.css` (queda sucio sobre fondo claro — bájalo o quítalo) y
-> los degradados de texto de `.hero-titulo` y `.section-title`, que sobre
-> blanco pierden contraste. Cuenta media hora de ajustes, no dos minutos.
+> **Ojo con esta:** la plantilla está pensada en oscuro. Al cambiar a claro hay
+> que revisar cuatro cosas concretas, y ninguna la detecta `npm run check`:
+>
+> 1. **Los halos animados de `body::before`** (`base.css`) y **las luces de
+>    `.hero-fondo::before`** (`components.css`): los `--brillo-movil*` se
+>    derivan del primario con alfa alta y sobre fondo hueso quedan sucios.
+>    Bájalos —redefine los tres tokens derivados en el bloque de la paleta— o
+>    quita las animaciones.
+> 2. **Los contornos `drop-shadow` negros** de `.hero-titulo` y
+>    `.section-title`: sobre fondo claro un borde negro es exactamente lo
+>    contrario de lo que hace falta. Súbelos a blanco o quítalos.
+> 3. **Los degradados de texto** de esos mismos títulos, que sobre blanco
+>    pierden contraste.
+> 4. **`--superficie-viva`**, el fondo de la ficha al pasar el puntero: se
+>    calcula aclarando `--surface` con blanco, y si `--surface` ya es blanco no
+>    se nota nada. En claro hay que oscurecerlo:
+>    `color-mix(in srgb, var(--surface) 96%, #000000)`.
+>
+> Cuenta una hora de ajustes, no dos minutos.
 
 ---
 

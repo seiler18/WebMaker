@@ -107,6 +107,12 @@ está explicado en `referencia/trampas.md`.
    necesitarlos.
 5. **Ningún color literal fuera de `src/styles/tokens.css`.** Cambiar la
    identidad del sitio debe ser editar un bloque, no buscar por todo el CSS.
+   Los lavados y translúcidos (fondo del enlace activo, barra difuminada,
+   ficha con el puntero encima) son **tokens derivados con `color-mix()`** de
+   los colores base: cambian solos con la paleta. Si falta uno, se añade a ese
+   bloque — no al componente. Excepciones: blancos y negros neutros
+   (`rgba(0,0,0,…)` de una sombra) no pertenecen a ninguna paleta.
+   → Cómo se rompió esto la primera vez: `referencia/trampas.md`, trampa 16.
 6. **Rejillas, no carruseles.** Una rejilla `auto-fill` enseña todo, se apila
    sola en móvil y no tiene alto que igualar ni flechas que tapen botones.
    Si no cabe, la respuesta es filtrar, no esconder.
@@ -124,6 +130,21 @@ está explicado en `referencia/trampas.md`.
     automatizado. Lo verificable es `npm run check`, `npm run build` y
     códigos HTTP sobre `npm run preview`. Si no comprobaste algo, dilo — no
     lo des por bueno.
+11. **El fondo se mueve, y con tokens propios.** Los halos de página
+    (`body::before`) y las luces de la portada (`.hero-fondo::before`) se
+    animan con `transform`; la rejilla, con `background-position`. Tres reglas
+    que ya costaron una revisión: la animación va **en el pseudo-elemento**
+    (un `transform` en el `body` atrapa el modal), usa los `--brillo-movil*` y
+    no los brillos tenues (si no, el movimiento no se percibe) y el ciclo va
+    en 15-22s (más largo es lo mismo que estático).
+12. **El fondo de la portada se desvanece por abajo.** La máscara de
+    `.hero-fondo` no es decoración: sin ella el `overflow: hidden` del hero
+    corta el fondo en una línea recta que parte la página en dos. Va en el
+    contenedor, no en los pseudos, y desvanece a `transparent`, no a `--bg`.
+13. **Un solo hover para todas las fichas.** `.tarjeta` y `.destacado`
+    comparten una regla en `components.css`. Si se retoca una, se retocan las
+    dos: tenerlas separadas es cómo se llega a que dos rejillas del mismo
+    sitio se comporten distinto.
 
 ## Convenciones
 

@@ -41,7 +41,7 @@ body[data-armazon="sidebar"] .app-main {
   right: 0;
   z-index: var(--z-barra);
   min-height: var(--topbar-h);
-  background: rgba(10, 14, 26, 0.82);
+  background: var(--barra-fondo);
   -webkit-backdrop-filter: blur(16px);
   backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--borde);
@@ -66,13 +66,18 @@ body[data-armazon="sidebar"] .topbar {
 .topbar-nav {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1rem;
   margin-left: auto;
 }
+/* `nowrap` en la lista y en cada enlace (más abajo). Con seis secciones de
+   etiqueta larga —«A quién atendemos», «Cómo trabajamos»— el menú se partía en
+   dos líneas y la barra crecía al doble de alto. Es el mismo motivo por el que
+   la marca no enseña el lema en esta barra. */
 .topbar-nav > ul {
   display: flex;
   align-items: center;
-  gap: 0.25rem;
+  flex-wrap: nowrap;
+  gap: 0.15rem;
 }
 .topbar-extras { display: flex; gap: 0.5rem; }
 
@@ -127,24 +132,37 @@ body[data-armazon="sidebar"] .topbar {
   text-overflow: ellipsis;
 }
 
+/* EL LEMA NO SE ENSEÑA EN LA BARRA SUPERIOR.
+   Un lema de largo normal se lleva unos 250 px de los 1180 del contenedor: con
+   cinco o más secciones el menú se queda sin sitio y se parte en dos líneas, y
+   encima el lema sale cortado con puntos suspensivos, que se ve peor que no
+   ponerlo. El lema se lee entero en la portada, que es su sitio.
+   En el armazón 'sidebar' hay una columna entera para él, así que ahí se
+   conserva. */
+body[data-armazon="topbar"] .topbar .marca-lema { display: none; }
+
 /* ----------------------- ENLACES DE NAVEGACIÓN ----------------------- */
 .nav-link {
   position: relative;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.55rem 0.85rem;
+  gap: 0.45rem;
+  padding: 0.5rem 0.7rem;
   border-radius: var(--radio-sm);
   color: var(--texto-tenue);
   font-weight: 600;
-  font-size: 0.92rem;
+  font-size: 0.88rem;
+  /* Que una etiqueta de dos palabras no se parta NUNCA por dentro. Sin esto,
+     «Cómo trabajamos» rompía la barra en dos líneas antes incluso de que el
+     menú llegara a desbordar. */
+  white-space: nowrap;
   transition: color 0.25s ease, background-color 0.25s ease;
 }
-.nav-link i { font-size: 0.9rem; transition: color 0.25s ease; }
+.nav-link i { font-size: 0.88rem; flex-shrink: 0; transition: color 0.25s ease; }
 .nav-link:hover { color: var(--texto-fuerte); background: rgba(255, 255, 255, 0.05); }
 .nav-link:hover i { color: var(--acento); }
 
-.nav-link.is-active { color: var(--texto-fuerte); background: rgba(37, 99, 235, 0.16); }
+.nav-link.is-active { color: var(--texto-fuerte); background: var(--primario-tenue); }
 .nav-link.is-active i {
   color: var(--acento);
   filter: drop-shadow(0 0 8px var(--brillo-acento));
@@ -214,7 +232,7 @@ body[data-armazon="sidebar"] .topbar {
   width: var(--sidebar-w);
   height: 100vh;
   padding: 1.4rem 1rem;
-  background: rgba(10, 14, 26, 0.82);
+  background: var(--barra-fondo);
   -webkit-backdrop-filter: blur(16px);
   backdrop-filter: blur(16px);
   border-right: 1px solid var(--borde);
@@ -318,6 +336,18 @@ body[data-armazon="sidebar"] .marca-movil { display: none; }
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
+
+  /* CONTORNO OSCURO — y tiene que ser `filter: drop-shadow`, NO `text-shadow`.
+     Con `-webkit-text-fill-color: transparent` el glifo no tiene relleno
+     propio: una `text-shadow` se pinta DEBAJO y se ve atravesando la letra,
+     sucia. `drop-shadow` actúa sobre el resultado ya recortado, así que dibuja
+     el borde por fuera y despega el título del fondo.
+     Dos sombras: una pegada al trazo (define el borde) y otra abierta (da
+     profundidad). Alguien intentará «simplificar» esto a una text-shadow;
+     este comentario es para que no lo haga. */
+  filter:
+    drop-shadow(0 0 1px rgba(0, 0, 0, 0.95))
+    drop-shadow(0 2px 4px rgba(0, 0, 0, 0.75));
 }
 .section-rule {
   width: 90px;

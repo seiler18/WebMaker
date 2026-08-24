@@ -26,13 +26,44 @@ body {
   line-height: 1.65;
   color: var(--texto);
   background-color: var(--bg);
-  /* Dos halos muy tenues rompen el plano del fondo sin distraer.
-     `fixed` para que no se muevan con el scroll: si se mueven, se notan. */
-  background-image:
-    radial-gradient(900px circle at 15% -10%, var(--brillo), transparent 45%),
-    radial-gradient(700px circle at 100% 0%, var(--brillo-acento), transparent 40%);
-  background-attachment: fixed;
   -webkit-font-smoothing: antialiased;
+}
+
+/* ----------------------- HALOS DE FONDO EN MOVIMIENTO -----------------------
+   Tres halos que se desplazan despacio y rompen el plano del fondo.
+
+   Van en un pseudo-elemento `fixed` y NO como `background-image` del body con
+   `background-attachment: fixed`, que fue la primera versión: el fondo del
+   body no se puede animar sin repintarlo entero en cada fotograma. Aquí se
+   mueve con `transform`, que lo resuelve el compositor y no cuesta nada.
+
+   LA ANIMACIÓN VA EN EL PSEUDO-ELEMENTO, NUNCA EN EL <body>. Un `transform` o
+   un `filter` en el body crea un contexto de apilamiento y el modal quedaría
+   atrapado por debajo de la barra de navegación (referencia/trampas.md, 4).
+
+   El tercer halo, el de abajo, es el que da movimiento perceptible cuando ya
+   se ha bajado de la portada: con solo los dos de arriba, el resto de la
+   página parece un fondo plano. Se detiene solo con `prefers-reduced-motion`
+   (regla al final de este archivo). */
+body::before {
+  content: "";
+  position: fixed;
+  inset: -25%;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    radial-gradient(900px circle at 15% 10%, var(--brillo-movil), transparent 48%),
+    radial-gradient(700px circle at 95% 5%, var(--brillo-movil-acento), transparent 42%),
+    radial-gradient(800px circle at 60% 90%, var(--brillo-movil-frio), transparent 45%);
+  animation: halos-fondo 19s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+@keyframes halos-fondo {
+  0%   { transform: translate3d(-6%, -4%, 0) scale(1); }
+  35%  { transform: translate3d(5%, 3%, 0) scale(1.18); }
+  70%  { transform: translate3d(8%, 7%, 0) scale(1.06); }
+  100% { transform: translate3d(-3%, 8%, 0) scale(1.2); }
 }
 
 /* ----------------------- TIPOGRAFÍA ----------------------- */
