@@ -1,6 +1,6 @@
 ---
 name: registrar-hito
-description: Dejar constancia en hitos/ de un cambio relevante, sea en un sitio generado o en la propia plantilla de WebMaker. Úsala al terminar un trabajo con sustancia (sitio nuevo publicado, rediseño, sección nueva, mejora de la plantilla) o cuando el usuario pida "registra esto", "anota el hito" o pregunte "¿en qué estábamos?".
+description: Dejar constancia en los hitos de un cambio relevante, sea en un sitio generado o en la propia plantilla de WebMaker. Úsala al terminar un trabajo con sustancia (sitio nuevo publicado, rediseño, sección nueva, mejora de la plantilla) o cuando el usuario pida "registra esto", "anota el hito" o pregunte "¿en qué estábamos?".
 ---
 
 # Registrar un hito

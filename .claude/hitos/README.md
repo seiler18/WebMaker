@@ -4,8 +4,8 @@ Memoria de cómo ha evolucionado **el taller**, no los sitios que salen de él.
 Lo más reciente primero.
 
 - `CLAUDE.md` → cómo se trabaja **hoy** con WebMaker.
-- `hitos/` → cómo se llegó hasta aquí, y qué se descartó.
-- `skills/` → los procedimientos.
+- `.claude/hitos/` → cómo se llegó hasta aquí, y qué se descartó.
+- `.claude/skills/` → los procedimientos.
 - `referencia/` → arquitectura, paletas, catálogo de secciones y trampas.
 
 ## Qué se registra aquí y qué no

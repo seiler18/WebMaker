@@ -60,25 +60,26 @@ cuando el cliente cambia de idea (y entonces se anota en su hito).
 
 | Necesitas… | Ve a |
 |---|---|
-| Arrancar un sitio nuevo de principio a fin | `skills/levantar-sitio/SKILL.md` |
-| Sacarle al usuario la información del sitio | `skills/recopilar-briefing/SKILL.md` |
-| Elegir colores, tipografía y armazón | `skills/definir-identidad/SKILL.md` |
-| Crear el proyecto y dejarlo compilando | `skills/generar-andamiaje/SKILL.md` |
-| Escribir las secciones | `skills/construir-secciones/SKILL.md` |
-| Dar la pasada de acabado antes de entregar | `skills/pulir-acabado/SKILL.md` |
-| Publicar en GitHub Pages | `skills/publicar-sitio/SKILL.md` |
-| Dejar memoria de lo hecho | `skills/registrar-hito/SKILL.md` |
+| Arrancar un sitio nuevo de principio a fin | `.claude/skills/levantar-sitio/SKILL.md` |
+| Sacarle al usuario la información del sitio | `.claude/skills/recopilar-briefing/SKILL.md` |
+| Elegir colores, tipografía y armazón | `.claude/skills/definir-identidad/SKILL.md` |
+| Crear el proyecto y dejarlo compilando | `.claude/skills/generar-andamiaje/SKILL.md` |
+| Escribir las secciones | `.claude/skills/construir-secciones/SKILL.md` |
+| Dar la pasada de acabado antes de entregar | `.claude/skills/pulir-acabado/SKILL.md` |
+| Publicar en GitHub Pages | `.claude/skills/publicar-sitio/SKILL.md` |
+| Dejar memoria de lo hecho | `.claude/skills/registrar-hito/SKILL.md` |
 | Entender **por qué** el sitio está hecho así | `referencia/arquitectura.md` |
 | Qué hace que un sitio se lea como caro | `referencia/acabado.md` |
 | Recetas de secciones que no vienen de fábrica | `referencia/catalogo-secciones.md` |
 | Paletas listas para usar | `referencia/paletas.md` |
 | Errores ya cometidos, para no repetirlos | `referencia/trampas.md` |
-| Qué se hizo en WebMaker y por qué | `hitos/` (empieza por su `README.md`) |
+| Qué se hizo en WebMaker y por qué | `.claude/hitos/` (empieza por su `README.md`) |
 | Los archivos que se copian a cada proyecto | `plantilla/` |
 
-Las skills de aquí **no se autodescubren**: viven en `skills/`, no en
-`.claude/skills/`. Se invocan leyendo su `SKILL.md` por ruta. Es a propósito —
-son una biblioteca que se copia, no comandos de un proyecto.
+Las skills de aquí viven en `.claude/skills/`, así que **se autodescubren**: se
+invocan por nombre, no por ruta. No confundirlas con
+`plantilla/dot-claude/skills/`, que es el juego distinto de skills que **hereda
+cada sitio generado** — ese no se ejecuta aquí, se copia.
 
 ## Qué produce WebMaker
 

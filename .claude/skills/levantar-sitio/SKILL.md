@@ -30,21 +30,21 @@ trabaja ahí mismo: los documentos fuente se quedan, y se mueven a `tools/`
 
 ## Los siete pasos
 
-### ① Briefing — `skills/recopilar-briefing/SKILL.md`
+### ① Briefing — `.claude/skills/recopilar-briefing/SKILL.md`
 
 **No se salta.** Lee la documentación que haya, pregunta solo lo que falta,
 escribe `briefing.md` y espera aprobación.
 
 Salida: `<PROYECTO>/briefing.md` en estado `aprobado por el usuario`.
 
-### ② Identidad — `skills/definir-identidad/SKILL.md`
+### ② Identidad — `.claude/skills/definir-identidad/SKILL.md`
 
 Paleta, tipografía y armazón (`topbar` o `sidebar`). Son tres decisiones, se
 resuelven en una tanda de preguntas con las opciones ya preparadas.
 
 Salida: tres valores anotados en el briefing.
 
-### ③ Andamiaje — `skills/generar-andamiaje/SKILL.md`
+### ③ Andamiaje — `.claude/skills/generar-andamiaje/SKILL.md`
 
 Copia `plantilla/`, sustituye los marcadores, ajusta `site-map.js` a las
 secciones del briefing y deja `npm run check` y `npm run build` en verde con
@@ -52,13 +52,13 @@ contenido de verdad (aunque falten textos).
 
 Salida: proyecto que compila. Todavía feo, pero vivo.
 
-### ④ Secciones — `skills/construir-secciones/SKILL.md`
+### ④ Secciones — `.claude/skills/construir-secciones/SKILL.md`
 
 Una sección por vez, en el orden del briefing. Tras cada una, `npm run check`.
 
 Salida: el sitio con su contenido real.
 
-### ⑤ Acabado — `skills/pulir-acabado/SKILL.md`
+### ⑤ Acabado — `.claude/skills/pulir-acabado/SKILL.md`
 
 Seis ejes en orden —jerarquía, tipografía, interacción, revelado, detalle,
 móvil— buscando lo que se salió del sistema de tokens. **No es rehacer el
@@ -72,13 +72,13 @@ impresión de la mayoría y lo único que no se puede verificar desde aquí.
 
 Salida: el sitio revisado y la lista de preguntas enviada al usuario.
 
-### ⑥ Publicar — `skills/publicar-sitio/SKILL.md`
+### ⑥ Publicar — `.claude/skills/publicar-sitio/SKILL.md`
 
 Repo en GitHub, primer push, Actions, verificación en producción.
 
 Salida: URL que funciona.
 
-### ⑦ Hito — `skills/registrar-hito/SKILL.md`
+### ⑦ Hito — `.claude/skills/registrar-hito/SKILL.md`
 
 En el proyecto hijo: `.claude/hitos/0001-…`. Qué se construyó, qué se decidió
 y qué quedó pendiente.

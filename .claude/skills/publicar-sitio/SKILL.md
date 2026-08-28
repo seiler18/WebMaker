@@ -95,7 +95,7 @@ hash, pero `index.html` no, y GitHub Pages lo cachea unos minutos.
   publicado y acepta el correo que llega. Hasta hacerlo, el formulario
   responde «pendiente de confirmación». Es el paso que más veces se olvida y
   el que hace que parezca que el sitio está roto.
-- Registra el hito `0001` del proyecto (`skills/registrar-hito`).
+- Registra el hito `0001` del proyecto (`.claude/skills/registrar-hito`).
 
 ## Cuando algo va mal
 

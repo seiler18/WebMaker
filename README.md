@@ -60,11 +60,12 @@ aparece el primer dato real; uno construido desde un briefing se ajusta.
 
 ```
 WebMaker/
-├── CLAUDE.md              el orquestador: el recorrido y las reglas
-├── skills/                8 procedimientos, uno por paso
-├── plantilla/             38 archivos: un sitio Vite 8 que ya funciona
-├── referencia/            arquitectura · acabado · trampas · paletas · catálogo
-└── hitos/                 qué se decidió y contra qué
+├── CLAUDE.md          el orquestador: el recorrido y las reglas
+├── .claude/
+│   ├── skills/        8 procedimientos, uno por paso
+│   └── hitos/         qué se decidió y contra qué
+├── plantilla/         38 archivos: un sitio Vite 8 que ya funciona
+└── referencia/        arquitectura · acabado · trampas · paletas · catálogo
 ```
 
 ### La plantilla
@@ -144,7 +145,7 @@ OneDrive/Desarrollo/
 ```
 
 El punto de entrada es
-[`skills/levantar-sitio/SKILL.md`](skills/levantar-sitio/SKILL.md).
+[`.claude/skills/levantar-sitio/SKILL.md`](.claude/skills/levantar-sitio/SKILL.md).
 
 ```bash
 # ya dentro del proyecto generado
@@ -154,9 +155,9 @@ npm run build      # check + vite build + copy-assets
 npm run preview    # único modo que reproduce las rutas de producción
 ```
 
-Las skills de `skills/` **no se autodescubren** (no están en
-`.claude/skills/`): se invocan por ruta. Es deliberado — son una biblioteca
-que se copia, no comandos de un proyecto.
+Las skills de `.claude/skills/` **se autodescubren**: se invocan por nombre.
+Las de `plantilla/dot-claude/skills/` son otras — las que hereda cada sitio
+generado — y aquí no se ejecutan, se copian.
 
 ### Lo que hereda cada sitio generado
 
@@ -171,7 +172,7 @@ WebMaker ya no hace falta para mantenerlo.
 
 Cuando construir un sitio revela un defecto de la plantilla, se anota en
 **dos** sitios: el arreglo del sitio en su hito, la corrección de la plantilla
-en `hitos/` de aquí. Sin las dos, el proyecto siguiente repite el error.
+en `.claude/hitos/` de aquí. Sin las dos, el proyecto siguiente repite el error.
 
 Un bloque nuevo sube a la plantilla **cuando lo pide un segundo proyecto**, no
 el primero. Así crece con lo demostrado útil y no con lo que pareció buena idea
@@ -192,7 +193,7 @@ automatizado — se comprobó que compila y sirve, no que se ve bien. Del sistem
 de acabado, lo que solo se puede confirmar en un teléfono real (la franja del
 gesto en iPhone, el zoom de Safari al enfocar un campo, si el escalonado se
 siente o se sufre) está **pendiente de la primera revisión visual**, y por eso
-`skills/pulir-acabado/SKILL.md` lleva el guion de preguntas para pedirla.
+`.claude/skills/pulir-acabado/SKILL.md` lleva el guion de preguntas para pedirla.
 
 Las recetas de [`referencia/catalogo-secciones.md`](referencia/catalogo-secciones.md)
 (línea de tiempo, preguntas frecuentes, tabla comparativa, galería) están

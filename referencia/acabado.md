@@ -267,6 +267,6 @@ comprueba:
 Lo que **solo se ve mirando**: si la jerarquía funciona, si el escalonado se
 siente o se sufre, si el título parte bien en un móvil concreto, si la foto se
 recorta donde importa. Eso lo revisa el usuario, y la lista de preguntas
-concretas está en `skills/pulir-acabado/SKILL.md`.
+concretas está en `.claude/skills/pulir-acabado/SKILL.md`.
 
 Decir «quedó impecable» sin esa pasada es exactamente la trampa 15.
