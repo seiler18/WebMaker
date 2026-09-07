@@ -25,6 +25,11 @@ cargue como instrucciones al trabajar dentro de WebMaker.
 proyecto: `editar-contenido`, `agregar-seccion`, `desplegar`,
 `optimizar-imagenes` y `registrar-hito`.
 
+Las dos skills de diseño y pruebas — `impeccable` y `playwright-cli` — **no**
+están aquí a propósito: se instalan con `npx` en el proyecto ya materializado
+(paso 5 de la skill `generar-andamiaje`). Son 2 MB por proyecto y así cada
+sitio nuevo estrena la última versión en vez de heredar una copia congelada.
+
 ## 2. Sustituir los marcadores
 
 Todos tienen la forma `{{NOMBRE}}`. `npm run check` **falla** si queda alguno

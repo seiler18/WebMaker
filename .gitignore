@@ -28,3 +28,29 @@ desktop.ini
 # Logs
 npm-debug.log*
 *.log
+
+### Claude Code — herramientas de diseño y pruebas ###
+#
+# Las skills SÍ se versionan (.claude/skills/, .claude/agents/): son parte del
+# proyecto y así viajan al otro PC con un git pull. Lo que se ignora es solo
+# lo que es propio de esta máquina o se regenera.
+
+# Hooks de Impeccable: son machine-local por diseño.
+.claude/settings.local.json
+
+# Motor de Impeccable: 14 MB de binario por plataforma. El lanzador lo vuelve
+# a descargar solo (con verificación sha256) la primera vez que se usa, así
+# que no tiene por qué vivir en el repositorio.
+.claude/skills/*/scripts/bin/
+
+# Impeccable: lo compartido (config.json, design.json, surfaces/) SÍ se
+# versiona. Lo de aquí es preferencia local o material regenerable.
+.impeccable/config.local.json
+.impeccable/cache/
+.impeccable/sessions/
+.impeccable/screenshots/
+.impeccable/live/state.json
+
+# Salida de Playwright CLI: PUEDE CONTENER CREDENCIALES Y COOKIES de sesión.
+# Nunca se versiona.
+.playwright-cli/

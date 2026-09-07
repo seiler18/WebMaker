@@ -110,7 +110,48 @@ Lo que no vale es dejar la referencia apuntando a un archivo que no existe:
 Si el usuario aporta imágenes pesadas, pásalas a WebP antes de meterlas
 (`referencia/trampas.md` tiene el comando de ImageMagick).
 
-## 5. Comprobar
+## 5. Instalar las herramientas de diseño y pruebas
+
+Dos skills que no vienen en la plantilla porque se instalan solas y conviene
+que cada proyecto traiga la version al dia:
+
+```bash
+npx impeccable install --providers=claude --scope=project
+npx @playwright/cli install --skills
+```
+
+- **Impeccable** deja `/impeccable` con sus comandos de acabado (`polish`,
+  `audit`, `critique`, `distill`, `quieter`…). Es la herramienta de
+  `pulir-acabado`, el paso ⑤ del recorrido.
+- **Playwright CLI** deja `/playwright-cli`, que es como se comprueba que el
+  sitio publicado carga de verdad: navegar, capturar, revisar movil.
+
+No se copian desde `plantilla/` a proposito: son 2 MB por proyecto y
+`npx` siempre trae la ultima version. Lo que si hay que hacer es cerrar el
+`.gitignore`, porque las dos escriben cosas que no deben subir:
+
+```
+.claude/settings.local.json          # hooks de Impeccable: son de esta maquina
+.claude/skills/*/scripts/bin/        # motor de Impeccable: 14 MB, se redescarga
+.impeccable/config.local.json        # preferencia local, no del proyecto
+.playwright-cli/                     # PUEDE CONTENER CREDENCIALES Y COOKIES
+```
+
+`.playwright-cli/` lo añade Playwright al `.gitignore` el solo. Los otros tres
+hay que ponerlos a mano. Las **skills si se versionan** (`.claude/skills/`,
+`.claude/agents/`): asi el proyecto funciona igual al abrirlo en otro equipo
+tras un `git pull`, sin reinstalar nada.
+
+Despues, dentro del chat del agente (no en la terminal):
+
+```
+/impeccable init
+```
+
+Eso escribe `PRODUCT.md` y `.impeccable/config.json`, que **si se versionan**:
+son el contexto de producto y de diseño del sitio, y deben viajar con el repo.
+
+## 6. Comprobar
 
 ```bash
 npm install
@@ -131,7 +172,7 @@ npm run preview
 Comprueba con `curl` que el index, el CSS, el JS y las imágenes responden 200.
 Y dile al usuario que le eche un ojo: la revisión visual no la puedes hacer tú.
 
-## 6. Primer commit
+## 7. Primer commit
 
 ```bash
 git init 2>/dev/null

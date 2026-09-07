@@ -42,6 +42,34 @@ acabado, y ninguno de los tres se puede tapar con CSS nuevo:
 
 ---
 
+## La herramienta: Impeccable
+
+Si el proyecto tiene instalado `/impeccable` (lo instala `generar-andamiaje`
+en su paso 5), esta pasada se hace **con** él, no a mano:
+
+| Para | Comando |
+|---|---|
+| Ver qué está fuera de sistema, sin tocar nada | `/impeccable audit` |
+| Opinión de dirección de arte sobre lo que hay | `/impeccable critique` |
+| La pasada de acabado propiamente dicha | `/impeccable polish` |
+| Quitar ruido, dejar solo lo que sostiene | `/impeccable distill` |
+| Sube o baja la intensidad visual | `/impeccable bolder` · `/impeccable quieter` |
+
+El orden que funciona es `audit` → arreglar lo que salga → `polish`. Empezar
+por `polish` sin auditar es pulir encima de un problema estructural.
+
+Ojo con una cosa: Impeccable trae su propio criterio de diseño, y este
+proyecto ya tiene el suyo en `referencia/acabado.md` y en `tokens.css`.
+**Manda el nuestro.** Si Impeccable propone un color, un tamaño o una curva
+que no está en los tokens, la respuesta es token o nada — es la regla 5, 14 o
+15 de `npm run check`, y esa la verifica la máquina, no el gusto.
+
+Para la revisión en navegador — que el sitio carga, que el móvil se ve bien,
+capturas para comparar — está `/playwright-cli`. La revisión **visual** sigue
+siendo del usuario: ninguna de las dos la sustituye.
+
+---
+
 ## Los seis ejes
 
 Se recorren en este orden. No es arbitrario: la jerarquía manda sobre la
