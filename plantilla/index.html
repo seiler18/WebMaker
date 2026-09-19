@@ -12,26 +12,101 @@
   <title>{{NOMBRE}} | {{TITULO_SEO}}</title>
   <meta name="description" content="{{DESCRIPCION}}">
   <meta name="author" content="{{NOMBRE}}">
+  <link rel="canonical" href="{{URL_PRODUCCION}}">
+  <!-- Pinta la barra del navegador en Android. Sin él sale gris claro y rompe
+       el tema oscuro nada más abrir. Mismo valor que --bg en tokens.css. -->
+  <meta name="theme-color" content="#0a0e1a">
 
   <link rel="icon" type="image/webp" href="./assets/img/favicon.webp">
+
+  <!-- ============================================================
+       SEGURIDAD DEL DOCUMENTO
+
+       GitHub Pages sirve archivos estáticos y NO deja poner cabeceras HTTP,
+       así que lo único que se puede endurecer va en <meta>. Tres avisos para
+       quien lo toque:
+
+       · `frame-ancestors` y `X-Frame-Options` se IGNORAN en <meta>: solo
+         valen como cabecera HTTP. No los añadas aquí creyendo que protegen.
+       · `script-src` lleva 'unsafe-inline' por el polyfill de módulos que
+         Vite puede insertar en línea en el build. Si tu sitio no lo necesita
+         (compruébalo con `npm run preview` y la consola abierta), quítalo:
+         la política se vuelve mucho más fuerte. `style-src` sí lo necesita
+         siempre, porque los componentes escriben `style="--i:3"`.
+       · Al añadir CUALQUIER servicio externo (analítica, mapa, tipografía,
+         vídeo, formulario), su dominio tiene que entrar en la directiva que
+         corresponda. Un dominio que falta no da más señal que una línea roja
+         en la consola: el widget simplemente no aparece.
+         → Ver referencia/seguridad.md de WebMaker.
+       ============================================================ -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data:; connect-src 'self' https://formsubmit.co; form-action 'self' https://formsubmit.co; upgrade-insecure-requests">
+  <!-- Al salir a un enlace externo se manda el origen, nunca la ruta completa. -->
+  <meta name="referrer" content="strict-origin-when-cross-origin">
 
   <!-- Redes sociales. og:image debe ser una URL ABSOLUTA: las relativas no
        las resuelve ni WhatsApp ni LinkedIn y la tarjeta sale sin imagen. -->
   <meta property="og:type" content="website">
+  <meta property="og:locale" content="es_CL">
+  <meta property="og:site_name" content="{{NOMBRE}}">
   <meta property="og:title" content="{{NOMBRE}} | {{TITULO_SEO}}">
   <meta property="og:description" content="{{DESCRIPCION}}">
   <meta property="og:url" content="{{URL_PRODUCCION}}">
   <meta property="og:image" content="{{URL_PRODUCCION}}assets/img/og.webp">
+  <meta property="og:image:alt" content="{{NOMBRE}}">
+  <!-- Sin `twitter:card`, X y LinkedIn enseñan una miniatura diminuta en vez
+       de la tarjeta grande con imagen. -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{NOMBRE}} | {{TITULO_SEO}}">
+  <meta name="twitter:description" content="{{DESCRIPCION}}">
+  <meta name="twitter:image" content="{{URL_PRODUCCION}}assets/img/og.webp">
+
+  <!-- ----------------------- FICHA EN JSON-LD -----------------------
+       Es lo que permite que un buscador lea la organización como DATOS
+       —nombre, web, logo— y no como un párrafo suelto. De aquí sale el panel
+       lateral de Google y la ficha de varios agregadores.
+
+       Va ESTÁTICO en el HTML a propósito: generado con JavaScript, los
+       rastreadores que no ejecutan scripts no verían nada.
+
+       Es la única copia de estos datos fuera de src/data/site.js, así que
+       `npm run check` compara nombre, URL y descripción, y falla si se
+       desincronizan. Si el sitio es de una PERSONA y no de una empresa,
+       cambia "@type" a "Person"; si tiene local con dirección y horario,
+       "LocalBusiness" y añade address y openingHours. -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "{{NOMBRE}}",
+    "description": "{{DESCRIPCION}}",
+    "url": "{{URL_PRODUCCION}}",
+    "logo": "{{URL_PRODUCCION}}assets/img/og.webp"
+  }
+  </script>
 
   <!-- Tipografía. `display=swap` enseña el texto con la fuente del sistema
-       mientras la real carga, en vez de dejar un hueco en blanco. -->
+       mientras la real carga, en vez de dejar un hueco en blanco.
+
+       LOS PESOS QUE PIDES AQUÍ SON LOS QUE PUEDES USAR EN EL CSS. Si una
+       regla usa `font-weight: 600` y el 600 no está en esta URL, el navegador
+       NO falla: FABRICA el peso engordando el trazo del 400 —la «falsa
+       negrita»— y el resultado es un texto sucio que se lee como plantilla
+       barata aunque todo lo demás esté bien. Si añades un peso al CSS,
+       añádelo también aquí. -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;600;700;800&display=swap"
+  <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700;800&display=swap"
         rel="stylesheet">
 
   <!-- Iconos (Font Awesome 6). Es la versión de referencia para elegir
-       clases: `fa-solid fa-x`, `fa-brands fa-x`. -->
+       clases: `fa-solid fa-x`, `fa-brands fa-x`.
+
+       `integrity` no es decoración: si el CDN devolviera un archivo distinto
+       al firmado aquí, el navegador lo descarta en vez de aplicarlo. Es la
+       única defensa real que tiene un sitio estático ante un CDN
+       comprometido, y `npm run check` falla si añades un recurso externo sin
+       ella. Para recalcularla al cambiar de versión:
+         curl -s <url> | openssl dgst -sha384 -binary | openssl base64 -A -->
   <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
         integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="

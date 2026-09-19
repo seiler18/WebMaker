@@ -104,7 +104,8 @@ body[data-armazon="sidebar"] .topbar {
 .marca-monograma {
   display: grid;
   place-items: center;
-  background: var(--degradado);
+  /* Lleva las iniciales encima: degradado accesible (ver tokens.css). */
+  background: var(--degradado-solido);
   color: #fff;
   font-family: var(--fuente-titulos);
   font-weight: 800;

@@ -17,6 +17,10 @@
     10. Ninguna duración ni curva de animación literal fuera de tokens.css.
     11. Toda imagen tiene un `alt` con texto.
     12. Todo `data-anim` usa una de las variantes que existen.
+    13. Todo `target="_blank"` lleva `rel="noopener"`.
+    14. Todo recurso externo (script o hoja de estilo) lleva `integrity`.
+    15. Ningún `onclick=` ni `href="javascript:"` (la CSP los bloquea).
+    16. La ficha JSON-LD del index.html dice lo mismo que site.js.
 
    El punto 5 es el que más veces rompe un sitio: Vite no valida las rutas
    que van dentro de strings de HTML, así que un nombre mal escrito solo se
@@ -293,6 +297,109 @@ for (const m of html.matchAll(/data-anim="([^"]*)"/g)) {
       `data-anim="${m[1]}" no existe. Variantes: ${[...ANIMS].join(', ')} ` +
         `(ver src/lib/reveal.js).`
     )
+  }
+}
+
+/* ============================================================
+   13 a 16 · SEGURIDAD DEL DOCUMENTO
+
+   Las cuatro comprueban cosas que FUNCIONAN igual de bien estando mal, y por
+   eso no se arreglan solas: un `target="_blank"` sin `rel` abre la pestaña,
+   un CDN sin `integrity` sirve el archivo, un `onclick` responde al clic en
+   local. El día en que dejan de estar bien ya es tarde.
+   ============================================================ */
+
+/* --- 13. Enlaces externos con rel="noopener" -------------------------
+   Una pestaña abierta con target="_blank" recibe `window.opener` y puede
+   redirigir la pestaña ORIGEN a donde quiera (tabnabbing): el visitante
+   vuelve creyendo que sigue en tu sitio y se encuentra otra cosa. Los
+   navegadores modernos ya lo aplican solos, pero no todos los que abren un
+   sitio lo son, y el atributo no cuesta nada. */
+for (const m of todoElHtml.matchAll(/<a\s[^>]*>/gi)) {
+  const etiqueta = m[0]
+  if (!/target\s*=\s*["']_blank["']/i.test(etiqueta)) continue
+  if (/rel\s*=\s*["'][^"']*noopener/i.test(etiqueta)) continue
+  const href = etiqueta.match(/href\s*=\s*["']([^"']*)["']/i)?.[1] || '(sin href)'
+  errores.push(`Enlace con target="_blank" sin rel="noopener": ${href}`)
+}
+
+/* --- 14. Recursos de terceros firmados con integrity -----------------
+   Si el CDN devolviera un archivo distinto al firmado, el navegador lo
+   descarta en vez de ejecutarlo. Es la única defensa real que tiene un sitio
+   estático ante un CDN comprometido.
+
+   Exentos los que sirven contenido VARIABLE y por tanto no tienen hash fijo:
+   Google Fonts devuelve un CSS distinto según el navegador que pregunta, y un
+   «kit» de Font Awesome es un loader generado por cuenta que cambia al tocar
+   su configuración. */
+const SIN_INTEGRIDAD = ['fonts.googleapis.com', 'kit.fontawesome.com']
+for (const m of todoElHtml.matchAll(/<(script|link)\s[^>]*>/gi)) {
+  const etiqueta = m[0]
+  const url = etiqueta.match(/(?:src|href)\s*=\s*["'](https?:\/\/[^"']+)["']/i)?.[1]
+  if (!url) continue
+  // De los <link> solo interesan los que traen CÓDIGO o estilos.
+  if (/^<link/i.test(etiqueta) && !/rel\s*=\s*["']stylesheet["']/i.test(etiqueta)) continue
+  if (SIN_INTEGRIDAD.some(h => url.includes(h))) continue
+  if (!/\sintegrity\s*=/i.test(etiqueta)) {
+    errores.push(
+      `Recurso externo sin integrity: ${url}\n` +
+        `      Calcula el hash: curl -s "${url}" | openssl dgst -sha384 -binary | openssl base64 -A`
+    )
+  }
+}
+
+/* --- 15. Nada de código en línea en los atributos --------------------
+   Un `onclick="…"` o un `href="javascript:…"` es lo primero que bloquea la
+   Content-Security-Policy del index.html: funcionaría en local y moriría en
+   silencio en producción. Además mezcla conducta con markup, que es justo lo
+   que separa esta plantilla. */
+const manejadoresVistos = new Set()
+for (const m of todoElHtml.matchAll(/<[a-z][^>]*\s(on[a-z]+)\s*=\s*["'][^"']*["'][^>]*>/gi)) {
+  if (manejadoresVistos.has(m[1])) continue
+  manejadoresVistos.add(m[1])
+  errores.push(`Manejador en línea "${m[1]}": usa addEventListener en un módulo de src/lib/`)
+}
+if (/href\s*=\s*["']javascript:/i.test(todoElHtml)) {
+  errores.push('href="javascript:…": la Content-Security-Policy lo bloquea en producción')
+}
+
+/* --- 16. La ficha JSON-LD dice lo mismo que src/data/site.js ---------
+   El bloque de datos estructurados es la única copia de estos datos fuera de
+   site.js, y es la que lee el buscador. Si el nombre o la descripción cambian
+   en site.js y ahí no, lo que se indexa queda desfasado sin que se note en la
+   pantalla. */
+const bloqueLd = htmlIndex.match(
+  /<script type="application\/ld\+json">([\s\S]*?)<\/script>/
+)?.[1]
+
+if (!bloqueLd) {
+  avisos.push(
+    'index.html no tiene bloque JSON-LD. Sin él, el buscador lee el sitio ' +
+      'como texto suelto en vez de como una ficha con nombre, web y logo.'
+  )
+} else if (!marcadores.length) {
+  // Con marcadores sin rellenar la comparación no diría nada útil: el punto 1
+  // ya ha dado el error que toca.
+  let ficha
+  try {
+    ficha = JSON.parse(bloqueLd)
+  } catch (e) {
+    errores.push(`El bloque JSON-LD de index.html no es JSON válido: ${e.message}`)
+  }
+  if (ficha) {
+    const pares = [
+      ['name', ficha.name, site.nombre],
+      ['description', ficha.description, site.descripcion],
+      ['url', ficha.url, site.url],
+    ]
+    for (const [campo, enFicha, enDatos] of pares) {
+      if (enFicha !== enDatos) {
+        errores.push(
+          `JSON-LD desincronizado: "${campo}" dice «${enFicha}» y ` +
+            `src/data/site.js dice «${enDatos}»`
+        )
+      }
+    }
   }
 }
 

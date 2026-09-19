@@ -86,9 +86,34 @@
   --ok:            #34d399;
   --error:         #f87171;
 
-  /* ----- Degradados ----- */
-  --degradado:      linear-gradient(135deg, var(--primario) 0%, var(--acento) 100%);
-  --degradado-texto:linear-gradient(135deg, var(--primario-claro) 0%, var(--acento) 100%);
+  /* ----- Degradados -----
+     TRES, y la diferencia importa:
+
+       --degradado         DECORATIVO. Reglas, separadores, acentos, barras:
+                           superficies donde NO se apoya ningún texto.
+       --degradado-solido  El que lleva TEXTO ENCIMA (botones, píldoras,
+                           monogramas, contadores de un filtro activo).
+       --degradado-texto   El que se recorta AL PROPIO texto (títulos).
+
+     Los dos primeros NO son intercambiables. El acento de una paleta suele
+     ser un color claro y saturado —aquí un cyan— y el blanco encima de él da
+     del orden de 1,8:1 de contraste: ilegible, muy por debajo del 4,5:1 que
+     exige la norma. En el proyecto original de esta plantilla el botón
+     principal del formulario de contacto era exactamente eso, y nadie lo vio
+     porque el extremo azul sí se leía bien.
+
+     --degradado-solido se DERIVA con color-mix en vez de escribirse a mano
+     para que siga funcionando al cambiar de paleta: oscurece los dos extremos
+     hasta que el blanco encima pasa de 5:1. Con la paleta por defecto da
+     7,0:1 y 5,5:1.
+
+     OJO con una paleta CLARA: esto asume texto blanco encima. Con texto
+     oscuro hay que mezclar con #ffffff en vez de #000000 y volver a medir. */
+  --degradado:       linear-gradient(135deg, var(--primario) 0%, var(--acento) 100%);
+  --degradado-solido:linear-gradient(135deg,
+                       color-mix(in srgb, var(--primario) 82%, #000000) 0%,
+                       color-mix(in srgb, var(--acento) 55%, #000000) 100%);
+  --degradado-texto: linear-gradient(135deg, var(--primario-claro) 0%, var(--acento) 100%);
 
   /* ============================================================
      TIPOGRAFÍA

@@ -14,6 +14,12 @@ verificador no las ve.
 las cinco solo se ven en un teléfono de verdad. Desde un escritorio el sitio
 parece correcto.
 
+**De la 27 a la 30 son las de la auditoría de seguridad y tipografía** (hito
+[0004](../hitos/0004-endurecimiento-y-tipografia.md)), y tienen algo peor en
+común: **ninguna se ve**. El sitio funciona, se ve bien y pasa la revisión
+visual con las cuatro puestas. Por eso las cuatro están ahora en
+`npm run check` — una regla que no se comprueba es una intención.
+
 ---
 
 ## 1. El `base` de Vite no coincide con el nombre del repo
@@ -455,6 +461,99 @@ con `scaleY`. Excepción documentada: la rejilla del hero anima
 `background-position`, porque con `transform` se movería también su máscara y
 se vería entrar el borde del recuadro — y es un patrón que se repite, así que
 el bucle es invisible.
+
+---
+
+## 27. Un recurso de un CDN sin `integrity`
+
+**Síntoma:** ninguno. El sitio carga perfectamente durante años.
+
+**Causa:** un `<script src="https://…">` o un `<link rel="stylesheet">` sin
+`integrity` le pide al navegador que ejecute **lo que sea** que devuelva ese
+CDN, hoy y dentro de tres años. Si la cuenta del CDN se compromete, o alguien
+se hace con el dominio caducado de una librería pequeña, tu sitio sirve su
+código con tu nombre encima. Es el ataque de cadena de suministro clásico.
+
+**Arreglo:** `integrity` + `crossorigin="anonymous"` en todo lo externo. Si el
+archivo no coincide con el hash, el navegador lo descarta en vez de
+ejecutarlo. `npm run check` (punto 14) falla si falta.
+
+```bash
+curl -s "<url>" | openssl dgst -sha384 -binary | openssl base64 -A
+```
+
+Solo se exime lo que sirve contenido **variable** y por tanto no tiene hash
+fijo: `fonts.googleapis.com` (devuelve un CSS distinto según el navegador) y
+los *kits* de Font Awesome (un loader generado por cuenta).
+
+---
+
+## 28. Un dominio que falta en la Content-Security-Policy
+
+**Síntoma:** un widget de terceros —el selector de idioma, un mapa, un vídeo
+incrustado— sale vacío o no sale. Nada más. Ningún error visible, ninguna
+alerta, el resto de la página perfecta.
+
+**Causa:** la CSP del `index.html` restringe de qué dominios puede venir cada
+tipo de recurso. Un dominio que no está declarado se bloquea **en silencio**:
+la única señal es una línea en la consola del navegador.
+
+Y casi nunca es un solo dominio. El traductor de Google, por ejemplo, carga
+desde `translate.google.com` **y** pide la lista de idiomas a
+`translate-pa.googleapis.com`, que es otro host y no lo cubre ningún comodín
+de los otros. Eso se descubrió abriendo la página con el navegador, no
+leyendo la documentación del servicio.
+
+**Arreglo:** cada vez que añadas un servicio externo, `npm run preview`, abre
+la consola y mira si hay bloqueos **antes** de desplegar. La consola limpia es
+parte de la verificación, igual que el código HTTP.
+
+Y dos avisos sobre la CSP en `<meta>`: `frame-ancestors` y `X-Frame-Options`
+se **ignoran** ahí (solo valen como cabecera HTTP, que GitHub Pages no deja
+poner), y `style-src` necesita `'unsafe-inline'` mientras los componentes
+escriban `style="--i:3"`.
+
+---
+
+## 29. Usar en el CSS un peso de letra que no se ha cargado
+
+**Síntoma:** los títulos y los botones se ven **sucios**: el trazo, engordado y
+un poco deforme, con los contornos emborronados. Se percibe como «plantilla
+barata» sin que se sepa señalar qué falla.
+
+**Causa:** la URL de Google Fonts pide, pongamos, `wght@400;700`, pero el CSS
+usa `font-weight: 600` en la navegación y `800` en los títulos. El navegador
+**no falla ni avisa**: fabrica el peso que falta engordando artificialmente el
+trazo del 400 — la «falsa negrita» (*faux bold*). Es de las cosas que más
+delatan un sitio y de las que menos se miran.
+
+**Arreglo:** que la lista de pesos de la URL sea exactamente la que usa el
+CSS. La plantilla pide `400;500;600;700;800`. Si añades un peso al CSS,
+añádelo a la URL. Para comprobarlo en el navegador ya publicado:
+
+```js
+[...new Set([...document.querySelectorAll('h1,h2,h3,a,button')]
+  .map(e => getComputedStyle(e).fontWeight))].sort()
+```
+
+---
+
+## 30. Texto blanco encima del degradado de marca
+
+**Síntoma:** un botón principal que en el mitad izquierda se lee perfecto y en
+la derecha cuesta. Nadie lo reporta: se lee «lo justo».
+
+**Causa:** el degradado de marca va del primario al **acento**, y el acento de
+una paleta suele ser un color claro y saturado. Blanco sobre un cyan tipo
+`#22d3ee` da **1,81:1** de contraste, cuando el mínimo exigible es 4,5:1. El
+extremo azul sí cumple, y eso es justo lo que despista al revisarlo de un
+vistazo.
+
+**Arreglo:** dos tokens distintos, que es lo que hace `tokens.css`.
+`--degradado` es decorativo (reglas, separadores, barras: **sin texto
+encima**) y `--degradado-solido` —derivado con `color-mix`, así que se adapta
+al cambiar de paleta— es el único que puede llevar texto. **Si pones texto
+sobre `--degradado`, lo has roto.**
 
 ---
 

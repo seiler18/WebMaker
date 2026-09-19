@@ -275,7 +275,9 @@
 }
 .btn.primario,
 .hero-btn.primario {
-  background: var(--degradado);
+  /* --degradado-solido y no --degradado: aqui hay texto blanco encima.
+     Ver el comentario de los degradados en tokens.css. */
+  background: var(--degradado-solido);
   color: #fff;
 }
 .btn.fantasma,
@@ -597,7 +599,7 @@
   font-size: var(--txt-micro);
   font-weight: 700;
 }
-.filtro.is-active .filtro-cuenta { background: var(--degradado); color: #fff; }
+.filtro.is-active .filtro-cuenta { background: var(--degradado-solido); color: #fff; }
 
 @media (hover: hover) {
   .filtro:hover { color: var(--texto-fuerte); border-color: var(--borde-vivo); }

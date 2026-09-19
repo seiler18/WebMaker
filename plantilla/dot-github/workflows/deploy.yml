@@ -22,6 +22,11 @@ concurrency:
   group: pages
   cancel-in-progress: true
 
+# Permisos al MÍNIMO, declarados también a nivel de workflow: lo que no está
+# aquí no lo hereda ningún job. Solo el de publicar necesita escribir.
+permissions:
+  contents: read
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -29,6 +34,12 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Sin esto, el checkout deja el token de Actions escrito en
+          # .git/config, donde lo puede leer cualquier paso posterior — o el
+          # script de instalación de una dependencia. El paso de publicar
+          # recibe el token explícitamente, así que aquí no hace falta.
+          persist-credentials: false
 
       - name: Preparar Node
         uses: actions/setup-node@v4
