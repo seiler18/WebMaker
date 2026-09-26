@@ -28,12 +28,18 @@ permissions:
   contents: read
 
 jobs:
+  # Las acciones van fijadas por SHA de commit, no por etiqueta (`@v4`): una
+  # etiqueta se puede mover, y si alguien se hace con la cuenta de la acción
+  # el siguiente deploy correría su código con permiso de escritura en el
+  # repo. El comentario de al lado dice qué versión es cada SHA; para
+  # actualizar: `git ls-remote --tags https://github.com/<acción>.git`.
+  # → referencia/trampas.md de WebMaker, trampa 32.
   deploy:
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           # Sin esto, el checkout deja el token de Actions escrito en
           # .git/config, donde lo puede leer cualquier paso posterior — o el
@@ -42,9 +48,14 @@ jobs:
           persist-credentials: false
 
       - name: Preparar Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
-          node-version: '20'
+          # La misma versión mayor que en local. Node 20 dejó de recibir
+          # parches de seguridad en abril de 2026, y sobre él corren `npm ci`
+          # y los scripts de instalación de las dependencias: no es sitio
+          # para un runtime sin mantenimiento. Vite 8 pide
+          # ^20.19 || >=22.12, así que 24 no rompe nada.
+          node-version: '24'
           cache: npm
 
       # `npm ci` y no `npm install`: instala exactamente lo del
@@ -56,7 +67,7 @@ jobs:
         run: npm run build
 
       - name: Publicar en gh-pages
-        uses: peaceiris/actions-gh-pages@v4
+        uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453 # v4.1.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist

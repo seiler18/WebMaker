@@ -20,6 +20,11 @@ común: **ninguna se ve**. El sitio funciona, se ve bien y pasa la revisión
 visual con las cuatro puestas. Por eso las cuatro están ahora en
 `npm run check` — una regla que no se comprueba es una intención.
 
+**La 31 y la 32 salen de la segunda auditoría de seguridad** (2026-09-26,
+sobre el Curriculo y la plantilla). Son de la misma familia: no se ven, y la
+plantilla ya sale con el arreglo puesto — la trampa está en lo que se le
+añade después.
+
 ---
 
 ## 1. El `base` de Vite no coincide con el nombre del repo
@@ -554,6 +559,58 @@ vistazo.
 encima**) y `--degradado-solido` —derivado con `color-mix`, así que se adapta
 al cambiar de paleta— es el único que puede llevar texto. **Si pones texto
 sobre `--degradado`, lo has roto.**
+
+---
+
+## 31. Datos de una API pintados con `innerHTML`
+
+**Síntoma:** ninguno. La demo funciona y la API devuelve lo que se espera.
+
+**Causa:** la plantilla monta el sitio con `innerHTML` a partir de strings, y
+eso está bien porque todo sale de `src/data/`. El problema llega cuando se le
+añade una sección que consume algo de fuera y se escribe igual:
+`el.innerHTML = '<h4>' + respuesta.nombre + '</h4>'`. Si la API —o quien se
+ponga en medio, o el que controle ese campo— devuelve un nombre con marcado,
+se ejecuta en tu dominio. Lo mismo con lo que venga de la URL
+(`location.search`, `location.hash`) o de `localStorage`. En el Curriculo lo
+tenía la Pokédex: los nombres de la PokeAPI entraban en la página con
+`.append('<option>' + nombre)` y `.html('<h4>' + nombre + '</h4>')`.
+
+**Arreglo:** lo que no sale de `src/data/` entra como **texto**:
+`textContent`, o `createElement` + `textContent` (en jQuery,
+`$('<h4>').text(nombre)`). Un `href` o un `src` de fuera se valida antes
+(`new URL(x).protocol === 'https:'`). La CSP sin `'unsafe-inline'` en
+`script-src` es la segunda red —corta el `<script>` y el `<img onerror>`
+inyectados—, pero solo mientras nadie vuelva a abrir `'unsafe-inline'` (el
+traductor de Google lo exige). Por eso la red no sustituye al arreglo.
+
+---
+
+## 32. Una acción de GitHub fijada por etiqueta
+
+**Síntoma:** ninguno. El deploy sale verde cada vez.
+
+**Causa:** `uses: peaceiris/actions-gh-pages@v4` no apunta a un código
+concreto: apunta a lo que la etiqueta `v4` señale **el día del deploy**. Las
+etiquetas se mueven —el autor lo hace en cada versión menor— y si alguien se
+hace con la cuenta de la acción puede moverla a código suyo. Ese job corre con
+`contents: write` y el token del repo en la mano.
+
+**Arreglo:** fijar cada acción por el SHA completo del commit, con la versión
+en un comentario para que siga siendo legible:
+
+```yaml
+- uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453 # v4.1.0
+```
+
+Para actualizar, se resuelve la etiqueta nueva y se cambia el SHA a mano:
+
+```bash
+git ls-remote --tags https://github.com/peaceiris/actions-gh-pages.git
+```
+
+La plantilla (`dot-github/workflows/deploy.yml`) ya sale así. Un sitio
+generado antes conserva `@v4` hasta que alguien lo cambie.
 
 ---
 

@@ -28,18 +28,24 @@
 
        · `frame-ancestors` y `X-Frame-Options` se IGNORAN en <meta>: solo
          valen como cabecera HTTP. No los añadas aquí creyendo que protegen.
-       · `script-src` lleva 'unsafe-inline' por el polyfill de módulos que
-         Vite puede insertar en línea en el build. Si tu sitio no lo necesita
-         (compruébalo con `npm run preview` y la consola abierta), quítalo:
-         la política se vuelve mucho más fuerte. `style-src` sí lo necesita
-         siempre, porque los componentes escriben `style="--i:3"`.
+       · `script-src` NO lleva 'unsafe-inline', y es a propósito: es lo que
+         hace que un script inyectado en la página no se ejecute. Vite 8 no
+         escribe ningún script en línea en el build (el polyfill de
+         modulepreload va dentro del .js del bundle); se comprobó con
+         `npm run preview` y el navegador, sin un solo bloqueo. El bloque
+         JSON-LD de abajo tampoco cuenta: es un bloque de datos y la CSP no
+         lo toca. Si algún día un servicio exige 'unsafe-inline' (el
+         traductor de Google, `@vitejs/plugin-legacy`), añádelo sabiendo lo
+         que se pierde: `npm run check` avisará (punto 17).
+         `style-src` sí lo necesita siempre, porque los componentes escriben
+         `style="--i:3"`.
        · Al añadir CUALQUIER servicio externo (analítica, mapa, tipografía,
          vídeo, formulario), su dominio tiene que entrar en la directiva que
          corresponda. Un dominio que falta no da más señal que una línea roja
          en la consola: el widget simplemente no aparece.
          → Ver referencia/seguridad.md de WebMaker.
        ============================================================ -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data:; connect-src 'self' https://formsubmit.co; form-action 'self' https://formsubmit.co; upgrade-insecure-requests">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data:; connect-src 'self' https://formsubmit.co; form-action 'self' https://formsubmit.co; upgrade-insecure-requests">
   <!-- Al salir a un enlace externo se manda el origen, nunca la ruta completa. -->
   <meta name="referrer" content="strict-origin-when-cross-origin">
 

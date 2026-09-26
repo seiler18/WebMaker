@@ -25,7 +25,7 @@ sí hay:
   cualquier dependencia.
 
 Ninguna de las tres se ve. El sitio funciona igual de bien con las tres mal, y
-por eso las tres están en `npm run check` (puntos 13 a 16): una regla que no
+por eso las tres están en `npm run check` (puntos 13 a 17): una regla que no
 se comprueba es una intención.
 
 ---
@@ -63,7 +63,7 @@ La de la plantilla, en una línea:
 
 ```
 default-src 'self'; base-uri 'self'; object-src 'none';
-script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com;
+script-src 'self' https://cdnjs.cloudflare.com;
 style-src  'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com;
 font-src   'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;
 img-src    'self' data:;
@@ -79,10 +79,17 @@ upgrade-insecure-requests
    iframe: no lo hacen.
 
 2. **`'unsafe-inline'` en `style-src` es obligatorio** mientras los
-   componentes escriban `style="--i:3"` para el escalonado. En `script-src`
-   está por el polyfill de módulos que Vite puede insertar; si tu sitio no lo
-   necesita —compruébalo con `npm run preview` y la consola abierta— quítalo,
-   que es donde la política gana de verdad.
+   componentes escriban `style="--i:3"` para el escalonado. **En `script-src`
+   no va**, y es donde la política gana de verdad: sin él, un script inyectado
+   en la página no se ejecuta. Estuvo puesto «por si Vite insertaba el
+   polyfill de módulos en línea», pero Vite 8 no escribe ningún script en
+   línea en el build (el polyfill va dentro del `.js` del bundle): se
+   comprobó con el build y el servidor de desarrollo en un navegador, sin un
+   solo bloqueo. El bloque JSON-LD tampoco cuenta: es de datos y la CSP no lo
+   toca. Si un servicio lo exige —el traductor de Google, o
+   `@vitejs/plugin-legacy`— se añade sabiendo lo que se pierde, y
+   `npm run check` (punto 17) lo recuerda en cada build. El mismo punto falla
+   si el `<meta>` de la CSP desaparece del `index.html`.
 
 3. **Un dominio que falta se bloquea EN SILENCIO.** El widget no sale y no
    pasa nada más. La única señal es una línea en la consola. Por eso, al
@@ -108,7 +115,8 @@ upgrade-insecure-requests
 
 Todo `target="_blank"` lleva `rel="noopener noreferrer"`. `noopener` corta el
 acceso a `window.opener` (tabnabbing); `noreferrer` evita además mandar la URL
-completa de origen.
+completa de origen. Lo mismo vale para `window.open(url, '_blank')` desde JS:
+tercer argumento `'noopener'`. `npm run check` (punto 13) mira las dos cosas.
 
 A nivel de documento, `<meta name="referrer" content="strict-origin-when-cross-origin">`
 hace que al salir a cualquier sitio externo se mande solo el origen y nunca la
@@ -141,11 +149,18 @@ jobs:
       contents: write   # solo el job que publica
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           persist-credentials: false   # el token no se queda en .git/config
       - run: npm ci                    # no `npm install`
 ```
+
+- **Acciones fijadas por SHA, no por etiqueta.** `@v4` es una etiqueta y el
+  dueño de la acción la puede mover —o quien le robe la cuenta—; el job que
+  publica corre con `contents: write`. El SHA de 40 caracteres no se mueve.
+  Se deja la versión en un comentario para saber qué es cada uno, y para
+  actualizar: `git ls-remote --tags https://github.com/<acción>.git`
+  (trampa 32).
 
 - **`npm ci` y no `npm install`.** `ci` instala exactamente lo que fija el
   `package-lock.json`. Con `install`, una dependencia transitiva puede subir
@@ -174,10 +189,22 @@ Ver también `trampas.md`, punto 12.
 
 ---
 
+## 7 · Lo que llega de fuera se pinta como texto
+
+Los componentes de la plantilla devuelven strings de HTML y `main.js` los
+monta con `innerHTML`. Es seguro **porque todo sale de `src/data/`**, que es
+contenido propio. En cuanto un dato llega de una API, de la URL
+(`location.search`, `location.hash`) o de `localStorage`, deja de serlo: va
+con `textContent` (o `createElement` + `textContent`), nunca concatenado en un
+string que acabe en `innerHTML`. Y un `href` que venga de fuera se valida
+(`https:` y nada más) antes de ponerlo. Trampa 31.
+
+---
+
 ## Verificación antes de publicar
 
 ```bash
-npm run check      # puntos 13 a 16: noopener, integrity, inline, JSON-LD
+npm run check      # puntos 13 a 17: noopener, integrity, inline, JSON-LD, CSP
 npm run build
 npm run preview    # y CON LA CONSOLA ABIERTA: ni un bloqueo de CSP
 ```

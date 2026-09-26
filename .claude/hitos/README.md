@@ -22,6 +22,7 @@ repite el error.
 
 | # | Fecha | Título | Estado |
 |---|---|---|---|
+| [0004](0004-plantilla-segura-por-defecto.md) | 2026-09-26 | Plantilla segura por defecto: CSP sin scripts en línea, acciones por SHA y Node 24 | completado |
 | [0003](0003-sistema-de-acabado.md) | 2026-08-24 | Sistema de acabado: escala tipográfica, movimiento y un verificador que los defiende | completado |
 | [0002](0002-correcciones-del-primer-sitio-de-cliente.md) | 2026-08-23 | Correcciones que trajo el primer sitio de cliente (CEDER SpA) | completado |
 | [0001](0001-nacimiento-de-webmaker.md) | 2026-08-23 | Nacimiento de WebMaker: plantilla destilada del sitio de currículum | completado |

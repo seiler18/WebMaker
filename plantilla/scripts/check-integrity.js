@@ -17,10 +17,12 @@
     10. Ninguna duración ni curva de animación literal fuera de tokens.css.
     11. Toda imagen tiene un `alt` con texto.
     12. Todo `data-anim` usa una de las variantes que existen.
-    13. Todo `target="_blank"` lleva `rel="noopener"`.
+    13. Todo `target="_blank"` lleva `rel="noopener"`, y todo `window.open`
+        de src/ lleva 'noopener'.
     14. Todo recurso externo (script o hoja de estilo) lleva `integrity`.
     15. Ningún `onclick=` ni `href="javascript:"` (la CSP los bloquea).
     16. La ficha JSON-LD del index.html dice lo mismo que site.js.
+    17. index.html lleva su CSP, y su `script-src` sin 'unsafe-inline'.
 
    El punto 5 es el que más veces rompe un sitio: Vite no valida las rutas
    que van dentro de strings de HTML, así que un nombre mal escrito solo se
@@ -40,9 +42,9 @@
    llegar a producción.
    ============================================================ */
 
-import { existsSync, readFileSync } from 'fs'
+import { existsSync, readFileSync, readdirSync } from 'fs'
 import { fileURLToPath } from 'url'
-import { dirname, join, resolve } from 'path'
+import { dirname, join, relative, resolve } from 'path'
 
 import { mapa } from '../src/site-map.js'
 import { site } from '../src/data/site.js'
@@ -301,9 +303,9 @@ for (const m of html.matchAll(/data-anim="([^"]*)"/g)) {
 }
 
 /* ============================================================
-   13 a 16 · SEGURIDAD DEL DOCUMENTO
+   13 a 17 · SEGURIDAD DEL DOCUMENTO
 
-   Las cuatro comprueban cosas que FUNCIONAN igual de bien estando mal, y por
+   Todas comprueban cosas que FUNCIONAN igual de bien estando mal, y por
    eso no se arreglan solas: un `target="_blank"` sin `rel` abre la pestaña,
    un CDN sin `integrity` sirve el archivo, un `onclick` responde al clic en
    local. El día en que dejan de estar bien ya es tarde.
@@ -321,6 +323,33 @@ for (const m of todoElHtml.matchAll(/<a\s[^>]*>/gi)) {
   if (/rel\s*=\s*["'][^"']*noopener/i.test(etiqueta)) continue
   const href = etiqueta.match(/href\s*=\s*["']([^"']*)["']/i)?.[1] || '(sin href)'
   errores.push(`Enlace con target="_blank" sin rel="noopener": ${href}`)
+}
+
+/* `window.open(url, '_blank')` es el mismo agujero por otra puerta, y el
+   regex de arriba no lo ve porque vive en el JS, no en el marcado. Se mira
+   desde `window.open(` hasta el `;` o el fin de línea: basta para las
+   llamadas de una línea que escribe esta plantilla (contacto.js). */
+function jsDe(dir, acc = []) {
+  for (const e of readdirSync(dir, { withFileTypes: true })) {
+    const p = join(dir, e.name)
+    if (e.isDirectory()) jsDe(p, acc)
+    else if (/\.js$/.test(e.name)) acc.push(p)
+  }
+  return acc
+}
+for (const archivo of jsDe(join(raiz, 'src'))) {
+  const lineas = readFileSync(archivo, 'utf8').split(/\r?\n/)
+  lineas.forEach((linea, i) => {
+    const desde = linea.indexOf('window.open(')
+    if (desde < 0 || linea.trimStart().startsWith('//')) return
+    const llamada = linea.slice(desde).split(';')[0]
+    if (!/noopener/.test(llamada)) {
+      errores.push(
+        `window.open sin 'noopener' en ${relative(raiz, archivo).split(/[\\/]/).join('/')}:${i + 1}` +
+          ` — pasa '_blank', 'noopener' como en contacto.js`
+      )
+    }
+  })
 }
 
 /* --- 14. Recursos de terceros firmados con integrity -----------------
@@ -401,6 +430,31 @@ if (!bloqueLd) {
       }
     }
   }
+}
+
+/* --- 17. La CSP sigue ahí, y sin aflojar ----------------------------
+   Es la única cabecera de seguridad que admite GitHub Pages (en <meta>), así
+   que borrarla al retocar el <head> deja el sitio sin ninguna — y no se nota
+   en nada. Lo de 'unsafe-inline' en `script-src` es AVISO y no error: hay
+   servicios que lo exigen (el traductor de Google inyecta scripts en línea),
+   pero con él un script inyectado en la página se ejecuta, que es
+   exactamente lo que la política debía impedir. Que quede dicho en cada
+   build, no olvidado en un commit. */
+// `content` va siempre entre comillas DOBLES: la política lleva simples
+// ('self', 'none') y con ellas de delimitador no se podría escribir.
+const csp = htmlIndex.match(
+  /<meta\s+http-equiv\s*=\s*["']Content-Security-Policy["']\s+content\s*=\s*"([^"]+)"/i
+)?.[1]
+if (!csp) {
+  errores.push(
+    'index.html no lleva <meta http-equiv="Content-Security-Policy">. ' +
+      'Recupérala de la plantilla de WebMaker (ver referencia/seguridad.md).'
+  )
+} else if (/script-src[^;]*'unsafe-inline'/.test(csp)) {
+  avisos.push(
+    "La CSP permite 'unsafe-inline' en script-src: un script inyectado en la " +
+      'página se ejecutaría. Si ningún servicio lo exige, quítalo.'
+  )
 }
 
 /* --- Informe --------------------------------------------------------- */

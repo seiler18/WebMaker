@@ -23,3 +23,12 @@ desktop.ini
 # Logs
 npm-debug.log*
 *.log
+
+# Secretos y ajustes de esta máquina. Un sitio de GitHub Pages no debe tener
+# NINGUNA credencial (regla 6 de su CLAUDE.md), pero si alguien crea un .env
+# «solo para probar en local», esto evita que acabe en un repo público.
+.env
+.env.*
+.claude/settings.local.json
+# Salida de Playwright CLI: puede contener cookies y credenciales de sesión.
+.playwright-cli/

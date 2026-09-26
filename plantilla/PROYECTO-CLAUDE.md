@@ -88,6 +88,11 @@ publicado en `gh-pages`. ~2 minutos. Ver skill `desplegar`.
 5. **`npm run check` antes de cualquier push.** Va dentro de `npm run build`,
    así que un fallo hace fallar el deploy en vez de llegar a producción.
 6. **Ninguna credencial en el proyecto.** GitHub Pages sirve todo en claro.
+   Y lo que llegue de fuera (una API, la URL, `localStorage`) se pinta con
+   `textContent`, nunca concatenado en un string de `innerHTML`: los
+   componentes pueden usar `innerHTML` solo porque todo sale de `src/data/`.
+   La CSP del `index.html` no lleva `'unsafe-inline'` en `script-src`, que es
+   la red para cuando eso falle; `npm run check` (punto 17) avisa si se añade.
 7. **Los documentos del cliente van en `tools/`**, que está en el
    `.gitignore`. Publicar uno es una decisión explícita: se copia a
    `assets/docs/` y se declara en `copy-assets.js`.
