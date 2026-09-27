@@ -80,9 +80,10 @@ La plantilla trae cuatro secciones de ejemplo (`inicio`, `nosotros`,
 `scripts/copy-assets.js` declara `assets/img` y `assets/docs`. Créalas, aunque
 sea con un `.gitkeep`: si no existen, el build avisa (no falla).
 
-El `favicon.webp` y el `og.webp` que pide `index.html` **sí** hacen falta, o
-`npm run check` los marcará como rutas rotas. Si todavía no hay imágenes,
-quita esas dos líneas del `<head>` y déjalo anotado como pendiente.
+El `favicon.webp` y el `og.jpg` que pide `index.html` **sí** hacen falta, o
+`npm run check` los marcará como rutas rotas. El `og.jpg` es una captura del
+sitio publicado (`referencia/trampas.md`, 33), así que el primer deploy sale
+sin él: quita sus líneas del `<head>`, publica, captura y vuelve a ponerlas.
 
 ## 5. Comprobar
 

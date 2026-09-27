@@ -612,6 +612,38 @@ git ls-remote --tags https://github.com/peaceiris/actions-gh-pages.git
 La plantilla (`dot-github/workflows/deploy.yml`) ya sale así. Un sitio
 generado antes conserva `@v4` hasta que alguien lo cambie.
 
+## 33. El enlace compartido sale sin imagen, o con una que ya no es el sitio
+
+**Síntoma:** al pegar la URL en WhatsApp o LinkedIn aparece solo el título, o
+una imagen vieja (el Curriculo enseñó su firma durante meses).
+
+**Causa:** una de tres. No hay `og:image` (el hub y `sistemas-gestion` salieron
+así). La imagen es WebP, que LinkedIn no pinta. O la imagen se hizo una vez a
+mano y nadie la rehízo cuando cambió el sitio.
+
+**Arreglo:** la tarjeta es una captura del sitio publicado, en JPG a
+1200×630, con `og:image:width`/`height` declarados. Se rehace cada vez que
+cambia la portada:
+
+```bash
+CH="C:/Program Files/Google/Chrome/Application/chrome.exe"
+IM="C:/Program Files/ImageMagick-7.1.2-Q16-HDRI/magick.exe"
+"$CH" --headless=new --hide-scrollbars --window-size=1200,630       --virtual-time-budget=8000 --screenshot="$TEMP/og.png" "$URL"
+"$IM" "$TEMP/og.png" -strip -quality 84 -interlace JPEG assets/img/og.jpg
+```
+
+`--virtual-time-budget` deja correr las animaciones de entrada; sin él la
+captura sale con el contenido aún invisible. Si hay un aviso que aparece a
+los pocos segundos (el «¿Hablamos?» del Curriculo), bájalo a ~1500.
+
+Nada que cambie con la hora en la captura: un «Cerrado» o un «Abierto ahora»
+se queda congelado en la tarjeta para siempre.
+
+Los lectores guardan la tarjeta días. Para ver la nueva sin esperar:
+<https://www.linkedin.com/post-inspector/> y
+<https://developers.facebook.com/tools/debug/> (este también refresca
+WhatsApp).
+
 ---
 
 ## Comandos útiles

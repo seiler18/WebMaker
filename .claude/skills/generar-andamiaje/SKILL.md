@@ -97,8 +97,11 @@ espacios, y una vez publicado no se cambia.
 mkdir -p assets/img assets/docs
 ```
 
-`index.html` referencia `assets/img/favicon.webp` y `assets/img/og.webp`. Si
-el usuario todavía no los ha aportado, tienes dos opciones honestas:
+`index.html` referencia `assets/img/favicon.webp` y `assets/img/og.jpg`. El
+`og.jpg` es la imagen de la tarjeta al compartir el enlace: una captura del
+sitio ya publicado, a 1200×630 (`referencia/trampas.md`, 33). Mientras no
+exista el sitio, o si el usuario no ha aportado el favicon, tienes dos
+opciones honestas:
 
 - Quitar esas dos líneas del `<head>` y anotarlo en el briefing como
   pendiente.
