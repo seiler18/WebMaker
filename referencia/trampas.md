@@ -362,20 +362,23 @@ para arreglar la barra.
 
 ---
 
-## 21. El breakpoint del armazón vive en dos archivos
+## 21. La cinta inferior del celular se pega arriba (o a la cabecera)
 
-**Síntoma:** hay una franja de anchos en la que el cajón del menú se queda
-abierto con los estilos de escritorio ya aplicados, y el menú aparece a medio
-camino.
+**Síntoma:** en móvil la cinta de navegación aparece justo bajo la cabecera, o
+se desplaza con ella, en vez de quedar fija al borde inferior de la pantalla.
 
-**Causa:** el ancho está en `styles/responsive.css` (`@media`) **y** en
-`components/shell.js` (`matchMedia`, que cierra el cajón al volver a
-escritorio). Se cambió uno y no el otro.
+**Causa:** la cinta es hija de `.topbar`, y `backdrop-filter` (igual que
+`transform` o `filter`) convierte a un ancestro en el bloque contenedor de sus
+descendientes `position: fixed`. El `fixed` deja de ser relativo a la pantalla.
 
-**Arreglo:** cambiar siempre los dos. Están comentados el uno al otro. Y el
-criterio para moverlo: con **seis o más secciones de etiqueta larga**, entre
-992 y 1200px los enlaces caben pero quedan sin aire, así que conviene subirlo
-a 1199.98 / 1200. Con cuatro o cinco secciones cortas, 991.98 va bien.
+**Arreglo:** apagar el `backdrop-filter` de `.topbar` dentro del `@media` de
+móvil y darle fondo opaco (`--barra-fondo-opaca`). Ya está hecho en
+`responsive.css`; hay que recordarlo si se añade otro ancestro con filtro.
+
+**Contexto:** hasta el hito 0006 el armazón `topbar` usaba un cajón
+desplegable en móvil. Se sustituyó por la cinta inferior, que es el estándar en
+todos los proyectos. El ancho de corte (991.98px) ya solo vive en
+`responsive.css`.
 
 ---
 

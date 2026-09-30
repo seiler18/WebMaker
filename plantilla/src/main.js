@@ -4,7 +4,7 @@
    Tres responsabilidades, en este orden:
      1. estilos   → el orden de import IMPORTA (responsive.css va último)
      2. markup    → cada componente devuelve un string de HTML
-     3. conducta  → scroll-spy, animaciones, menú, filtros, formulario
+     3. conducta  → scroll-spy, animaciones, filtros, formulario
    ============================================================ */
 
 /* --- 1. Estilos ---------------------------------------------------------
@@ -20,7 +20,7 @@ import './styles/responsive.css'
 /* --- 2. Markup --------------------------------------------------------- */
 import { site } from './data/site.js'
 import { mapa } from './site-map.js'
-import { renderShell, initShell } from './components/shell.js'
+import { renderShell } from './components/shell.js'
 import { renderFooter } from './components/footer.js'
 import { initTarjetas } from './components/sections/tarjetas.js'
 import { initContacto } from './components/sections/contacto.js'
@@ -54,7 +54,6 @@ app.innerHTML = `
 // sección no se marque activa antes de asomar por debajo de ella.
 const refrescarSpy = initScrollSpy({ offset: 96 })
 
-initShell()      // menú móvil (solo en el armazón 'topbar')
 initReveal()     // animaciones de entrada
 initModales()    // diálogos «ver más», si alguna sección los usa
 initTarjetas()   // botoneras de filtro de las rejillas

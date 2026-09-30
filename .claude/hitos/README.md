@@ -22,6 +22,7 @@ repite el error.
 
 | # | Fecha | Título | Estado |
 |---|---|---|---|
+| [0006](0006-cinta-inferior-movil-estandar.md) | 2026-09-30 | La cinta inferior del celular es el estándar | completado |
 | [0005](0005-tarjeta-al-compartir.md) | 2026-09-27 | La tarjeta al compartir es una captura del sitio | completado |
 | [0004](0004-plantilla-segura-por-defecto.md) | 2026-09-26 | Plantilla segura por defecto: CSP sin scripts en línea, acciones por SHA y Node 24 | completado |
 | [0003](0003-sistema-de-acabado.md) | 2026-08-24 | Sistema de acabado: escala tipográfica, movimiento y un verificador que los defiende | completado |

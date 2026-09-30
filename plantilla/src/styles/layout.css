@@ -16,7 +16,7 @@
      body[data-armazon="sidebar"]
        #app
        ├── .skip-link
-       ├── aside.sidenav          (fija izquierda; barra inferior en móvil)
+       ├── aside.sidenav          (fija izquierda)
        ├── header.topbar-minima   (fija arriba, arranca tras la sidebar)
        └── .app-main              (desplazada por margin-left)
            ├── main#contenido
@@ -209,43 +209,6 @@ body[data-armazon="topbar"] .topbar .marca-lema { display: none; }
   transition: transform var(--medio) var(--curva-salida);
 }
 .topbar .nav-link.is-active::after { transform: translateX(-50%) scaleX(1); }
-
-/* ----------------------- BOTÓN DE MENÚ (móvil) -----------------------
-   Oculto en escritorio; responsive.css lo enciende. Las tres barras se
-   dibujan con un pseudo-elemento cada una más el fondo del propio span. */
-.menu-boton {
-  display: none;
-  width: var(--toque-min);
-  height: var(--toque-min);
-  margin-left: auto;
-  padding: 0;
-  background: none;
-  border: 1px solid var(--borde);
-  border-radius: var(--radio-sm);
-  cursor: pointer;
-  touch-action: manipulation;
-}
-.menu-boton-barras,
-.menu-boton-barras::before,
-.menu-boton-barras::after {
-  display: block;
-  width: 20px;
-  height: 2px;
-  margin: 0 auto;
-  background: var(--texto);
-  border-radius: 2px;
-  transition:
-    transform var(--medio) var(--curva-salida),
-    opacity var(--rapido) var(--curva-suave);
-}
-.menu-boton-barras::before { content: ""; transform: translateY(-6px); }
-.menu-boton-barras::after  { content: ""; transform: translateY(4px); }
-
-/* Aspa cuando está abierto. `aria-expanded` es la fuente de verdad del
-   estado, así que el CSS lo lee de ahí en vez de una clase paralela. */
-.menu-boton[aria-expanded="true"] .menu-boton-barras { background: transparent; }
-.menu-boton[aria-expanded="true"] .menu-boton-barras::before { transform: rotate(45deg); }
-.menu-boton[aria-expanded="true"] .menu-boton-barras::after  { transform: rotate(-45deg); }
 
 /* ----------------------- COLUMNA LATERAL ----------------------- */
 .sidenav {

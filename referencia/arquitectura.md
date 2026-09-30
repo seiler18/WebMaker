@@ -77,8 +77,10 @@ Añadir una sección = añadir una fila.
 CSS.
 
 Comparten los enlaces, el scroll-spy, las secciones y los tokens: lo único que
-cambia es el chrome de navegación y su forma en móvil (cajón desplegable vs
-barra inferior de iconos). Cambiar de una a otra es una línea.
+cambia es el chrome de navegación en escritorio (barra superior vs columna
+lateral). **En móvil las dos son la misma cinta fija de iconos en la parte
+inferior** (estándar de todos los proyectos: FinanzasMaker, Curriculo, etc.;
+no hay menú hamburguesa). Cambiar de una a otra es una línea.
 
 ## El scroll-spy no usa IntersectionObserver
 

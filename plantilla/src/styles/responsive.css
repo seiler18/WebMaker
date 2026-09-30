@@ -6,19 +6,13 @@
    Si lo subes de sitio, empezarás a necesitarlos.
 
    Corte principal en 991.98px: por debajo de ese ancho no caben a la vez una
-   columna lateral y contenido legible, así que cada armazón cambia de forma:
-
-     'topbar'   → los enlaces se esconden en un cajón desplegable
-     'sidebar'  → la columna se convierte en barra inferior de iconos
-
-   ESTE ANCHO VA EN PAREJA con el `matchMedia` de src/components/shell.js, que
-   cierra el cajón al volver a escritorio. Si cambias uno sin el otro, queda
-   una franja de anchos en la que el cajón sigue abierto con los estilos de
-   escritorio ya aplicados, y el menú aparece a medio camino.
+   columna lateral (o un menú en línea) y contenido legible, así que los dos
+   armazones ('topbar' y 'sidebar') pasan a la MISMA cinta fija de iconos en
+   la parte inferior. Es el estándar de todos los proyectos para móvil.
 
    CUÁNDO SUBIRLO: con seis o más secciones de etiqueta larga («A quién
    atendemos»), entre 992 y 1200px los enlaces caben pero quedan pegados unos a
-   otros y sin aire. En ese caso, 1199.98px aquí y 1200px en shell.js. Con
+   otros y sin aire. En ese caso, 1199.98px aquí. Con
    cuatro o cinco secciones cortas, 991.98 va bien.
 
    AL FINAL de este archivo hay dos bloques que NO son de ancho sino de tipo de
@@ -30,88 +24,53 @@
 
 @media (max-width: 991.98px) {
 
-  /* ================= ARMAZÓN 'topbar': cajón desplegable ================= */
-  .menu-boton { display: block; }
+  /* ================= CINTA INFERIOR (los dos armazones) =================
+     En móvil la navegación es SIEMPRE una cinta fija de iconos abajo, al
+     alcance del pulgar: no hay menú hamburguesa ni cajón. Es la misma cinta
+     para 'topbar' (.topbar-nav) y para 'sidebar' (.sidenav); solo cambia de
+     dónde sale. Las reglas de abajo las comparten con :is().
 
-  .topbar-nav {
-    position: fixed;
-    top: var(--topbar-h);
-    left: 0;
-    right: 0;
-    z-index: var(--z-menu-movil);
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0;
-    max-height: calc(100vh - var(--topbar-h));
-    padding: 0.75rem 1rem 1.25rem;
-    background: var(--barra-fondo-opaca);
-    -webkit-backdrop-filter: blur(16px);
-    backdrop-filter: blur(16px);
-    border-bottom: 1px solid var(--borde);
-    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5);
-    overflow-y: auto;
+     Antes el armazón 'topbar' usaba un cajón desplegable desde arriba. Se
+     quitó porque esconde las secciones detrás de un toque, y en el resto de
+     proyectos (FinanzasMaker, Curriculo…) la cinta inferior es la norma. */
 
-    /* Cerrado: plegado hacia arriba y sin poder recibir clics.
-       Se usa scaleY + opacity en vez de `display:none` para que la apertura
-       se pueda animar. `visibility` es lo que lo saca del tabulador: con
-       solo opacity:0 seguiría siendo enfocable.
-       La apertura usa --medio y la curva de salida: un menú que tarda --lento
-       en abrirse se siente como una página que va lenta, no como una página
-       cuidada. */
-    transform-origin: top;
-    transform: scaleY(0.85);
-    opacity: 0;
-    visibility: hidden;
-    transition:
-      transform var(--medio) var(--curva-salida),
-      opacity var(--medio) var(--curva-salida),
-      visibility var(--medio);
-  }
-  .topbar-nav.abierto {
-    transform: none;
-    opacity: 1;
-    visibility: visible;
-  }
-
-  .topbar-nav > ul { flex-direction: column; align-items: stretch; gap: 0.15rem; }
-  /* En el cajón los enlaces son filas de menú, no orientación al margen: van
-     en el tamaño del cuerpo y con alto de zona pulsable. */
-  .topbar-nav .nav-link { padding: 0.85rem 1rem; font-size: var(--txt-cuerpo); }
-  /* En el cajón el subrayado no tiene sentido: los enlaces son filas. */
-  .topbar .nav-link::after { display: none; }
-  .topbar-nav .nav-link.is-active {
-    box-shadow: inset 3px 0 0 var(--acento);
-  }
-
-  .topbar-nav .topbar-extras {
-    flex-direction: column;
-    margin-top: 0.75rem;
-    padding-top: 0.75rem;
-    border-top: 1px solid var(--borde);
-  }
-
-  /* ============ ARMAZÓN 'sidebar': barra inferior de iconos ============ */
-  body[data-armazon="sidebar"] .app-main {
-    margin-left: 0;
-    /* Hueco para que la barra inferior no tape el final del pie. Incluye la
-       franja del gesto de los iPhone sin botón: sin ella el último enlace del
-       pie queda debajo de la raya y no se puede pulsar. */
+  /* Hueco para que la cinta no tape el final del pie. Incluye la franja del
+     gesto de los iPhone sin botón: sin ella el último enlace del pie queda
+     debajo de la raya y no se puede pulsar. */
+  .app-main {
     padding-bottom: calc(var(--barra-movil-h) + env(safe-area-inset-bottom, 0px));
   }
+  body[data-armazon="sidebar"] .app-main { margin-left: 0; }
   body[data-armazon="sidebar"] .topbar { left: 0; }
 
-  /* La marca de la barra superior aparece: la cabecera de la sidebar se
-     oculta abajo y sin esto el logo no se vería en el celular. */
+  /* `backdrop-filter` crea un bloque contenedor para los hijos `fixed`: con
+     él en la barra superior, la cinta (hija suya) quedaría pegada a la
+     cabecera y no al borde de la pantalla. Se apaga aquí y el fondo pasa a ser
+     el opaco. */
+  .topbar {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: var(--barra-fondo-opaca);
+  }
+
+  /* La marca de la barra superior aparece: en 'sidebar' la cabecera de la
+     columna se oculta abajo y sin esto el logo no se vería en el celular. */
   body[data-armazon="sidebar"] .marca-movil { display: flex; }
   body[data-armazon="sidebar"] .marca-movil .marca-lema { display: none; }
+  /* Las descargas se quedan arriba, a la derecha de la marca. */
+  .topbar-extras { margin-left: auto; }
 
-  .sidenav {
+  :is(.topbar-nav, .sidenav) {
+    position: fixed;
     top: auto;
     bottom: 0;
     left: 0;
     right: 0;
+    z-index: var(--z-menu-movil);
+    display: flex;
     flex-direction: row;
     width: 100%;
+    margin: 0;
     /* El alto crece con la franja del gesto y el relleno la reserva por
        dentro, así que los iconos quedan centrados en la parte pulsable y no
        debajo de la raya. `env()` vale 0 en todo lo que no sea un iPhone con
@@ -120,20 +79,31 @@
        <meta name="viewport"> de index.html. */
     height: calc(var(--barra-movil-h) + env(safe-area-inset-bottom, 0px));
     padding: 0 0 env(safe-area-inset-bottom, 0px);
+    background: var(--barra-fondo-opaca);
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
     border-right: none;
     border-top: 1px solid var(--borde);
     box-shadow: 0 -6px 26px rgba(0, 0, 0, 0.55);
     overflow-x: auto;
     overflow-y: hidden;
   }
-  /* Marca y acciones no caben en una barra de 62px: en móvil viven arriba. */
+  /* Marca y acciones de la columna no caben en la cinta: en móvil viven arriba. */
   .sidenav-brand,
   .sidenav-actions { display: none; }
 
-  .sidenav-nav { flex-direction: row; gap: 0; height: 100%; width: 100%; }
-  .sidenav-nav li { flex: 1 1 0; min-width: 62px; }
+  :is(.sidenav-nav, .topbar-nav > ul) {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    flex-wrap: nowrap;
+    gap: 0;
+    height: 100%;
+    width: 100%;
+  }
+  :is(.sidenav-nav, .topbar-nav > ul) > li { flex: 1 1 0; min-width: 62px; }
 
-  .sidenav .nav-link {
+  :is(.sidenav, .topbar-nav) .nav-link {
     flex-direction: column;
     justify-content: center;
     gap: 0.18rem;
@@ -144,23 +114,30 @@
     text-align: center;
     line-height: 1.15;
   }
-  .sidenav .nav-link i { font-size: var(--icono-medio); }
+  :is(.sidenav, .topbar-nav) .nav-link i { font-size: var(--icono-medio); }
 
-  /* El acento pasa de barra lateral a subrayado superior */
-  .sidenav .nav-link::before {
+  /* El acento activo pasa a ser un subrayado superior. Se redefine entero
+     (y no solo la geometría) porque en 'topbar' el acento de escritorio es
+     el ::after inferior y este ::before no existe. */
+  :is(.sidenav, .topbar-nav) .nav-link::after { display: none; }
+  :is(.sidenav, .topbar-nav) .nav-link::before {
+    content: "";
+    position: absolute;
     top: 0;
     left: 50%;
     width: 58%;
     height: 3px;
     border-radius: 0 0 3px 3px;
+    background: var(--degradado);
     transform: translateX(-50%) scaleX(0);
+    transition: transform var(--medio) var(--curva-salida);
   }
-  .sidenav .nav-link.is-active::before { transform: translateX(-50%) scaleX(1); }
-  .sidenav .nav-link.is-active { background: var(--primario-tenue); }
+  :is(.sidenav, .topbar-nav) .nav-link.is-active::before { transform: translateX(-50%) scaleX(1); }
+  :is(.sidenav, .topbar-nav) .nav-link.is-active { background: var(--primario-tenue); }
 
   /* Etiquetas: la larga se va, la corta aparece */
-  body[data-armazon="sidebar"] .sidenav .nav-largo { display: none; }
-  body[data-armazon="sidebar"] .sidenav .nav-corto { display: block; }
+  :is(.sidenav, .topbar-nav) .nav-largo { display: none; }
+  :is(.sidenav, .topbar-nav) .nav-corto { display: block; }
 }
 
 /* --- Dos columnas → una --- */

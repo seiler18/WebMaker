@@ -7,10 +7,15 @@ import { mapaMenu } from '../site-map.js'
    Dos variantes, elegidas con `site.armazon`. Comparten los mismos enlaces
    (salen de site-map.js) y el mismo scroll-spy; solo cambia el chrome:
 
-     'topbar'   Barra superior fija. En móvil, menú desplegable (cajón).
-                Lo esperable en un sitio de empresa.
-     'sidebar'  Columna fija a la izquierda. En móvil, barra inferior de
-                iconos. Cómodo para recorrer muchas secciones de un tirón.
+     'topbar'   Barra superior fija con los enlaces en línea. Lo esperable
+                en un sitio de empresa.
+     'sidebar'  Columna fija a la izquierda. Cómodo para recorrer muchas
+                secciones de un tirón.
+
+   EN MÓVIL LOS DOS SON LO MISMO: una cinta fija de iconos en la parte
+   inferior (al alcance del pulgar), con la marca arriba. No hay menú
+   hamburguesa ni cajón: son los mismos enlaces, solo cambia el CSS
+   (styles/responsive.css).
 
    Cada enlace lleva `data-spy-link` con el id de su sección: es el contrato
    con src/lib/scrollspy.js, que le añade la clase `.is-active`.
@@ -81,15 +86,13 @@ function armazonTopbar() {
       <div class="topbar-inner">
         ${marca('marca')}
 
-        <nav class="topbar-nav" id="menuPrincipal" aria-label="Secciones">
+        <nav class="topbar-nav" aria-label="Secciones">
           <ul>${enlaces('nav-link')}</ul>
-          ${descargas.length ? `<div class="topbar-extras">${botonesDescarga()}</div>` : ''}
         </nav>
 
-        <button type="button" class="menu-boton" id="botonMenu"
-                aria-controls="menuPrincipal" aria-expanded="false" aria-label="Abrir menú">
-          <span class="menu-boton-barras" aria-hidden="true"></span>
-        </button>
+        <!-- Fuera del <nav> a propósito: en móvil el <nav> baja a la cinta
+             inferior y las descargas tienen que quedarse arriba. -->
+        ${descargas.length ? `<div class="topbar-extras">${botonesDescarga()}</div>` : ''}
       </div>
     </header>
   `
@@ -122,47 +125,4 @@ function armazonSidebar() {
 
 export function renderShell() {
   return site.armazon === 'sidebar' ? armazonSidebar() : armazonTopbar()
-}
-
-/**
- * Abre y cierra el menú móvil de la variante 'topbar'.
- * En la variante 'sidebar' no hay botón y esto no hace nada.
- */
-export function initShell() {
-  const boton = document.getElementById('botonMenu')
-  const menu = document.getElementById('menuPrincipal')
-  if (!boton || !menu) return
-
-  const cerrar = () => {
-    menu.classList.remove('abierto')
-    boton.setAttribute('aria-expanded', 'false')
-    boton.setAttribute('aria-label', 'Abrir menú')
-  }
-
-  boton.addEventListener('click', () => {
-    const abierto = menu.classList.toggle('abierto')
-    boton.setAttribute('aria-expanded', String(abierto))
-    boton.setAttribute('aria-label', abierto ? 'Cerrar menú' : 'Abrir menú')
-  })
-
-  // Al elegir una sección el menú sobra: si se queda abierto, tapa
-  // justamente lo que se acaba de pedir ver.
-  menu.addEventListener('click', evento => {
-    if (evento.target.closest('a')) cerrar()
-  })
-
-  document.addEventListener('keydown', evento => {
-    if (evento.key === 'Escape') cerrar()
-  })
-
-  // Al pasar a escritorio el cajón deja de tener sentido: si quedó abierto,
-  // sus estilos de móvil ya no aplican y el menú aparecería a medio camino.
-  //
-  // ESTE ANCHO VA EN PAREJA con el @media de styles/responsive.css (991.98px),
-  // que es donde se explica cuándo conviene subirlo. Si cambias uno sin el
-  // otro, queda una franja de anchos con el cajón abierto y los estilos de
-  // escritorio aplicados.
-  window.matchMedia('(min-width: 992px)').addEventListener('change', e => {
-    if (e.matches) cerrar()
-  })
 }

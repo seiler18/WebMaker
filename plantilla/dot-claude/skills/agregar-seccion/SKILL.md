@@ -61,8 +61,8 @@ import { proyectos } from './data/proyectos.js'
 Sobre el `id`: minúsculas, sin acentos ni espacios. **Va en la URL** y se
 comparte como enlace, así que una vez publicado no se cambia.
 
-Sobre `short`: es lo que se ve en la barra inferior de móvil (armazón
-`sidebar`) y en el cajón. Más de ~8 caracteres y se parte en dos líneas.
+Sobre `short`: es lo que se ve en la cinta inferior de móvil (ambos
+armazones). Más de ~8 caracteres y se parte en dos líneas.
 
 Con `enMenu: false` la sección existe en la página pero no se enlaza. Útil
 para un aviso legal al que solo se llega desde el pie.

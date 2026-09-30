@@ -91,7 +91,7 @@ y qué quedó pendiente.
 | Imagen que se ve en local y da 404 publicada | Mayúsculas del nombre | GitHub Pages distingue, Windows no. Renombra copiando el nombre con `ls` |
 | Imagen que no aparece ni en local | No está declarada en `scripts/copy-assets.js` | Vite no ve las rutas dentro de strings de HTML |
 | El formulario dice «pendiente de confirmación» | FormSubmit no tiene el buzón validado | Es lo normal la primera vez. Hay que aceptar el correo que llega |
-| El menú móvil se queda abierto al pasar a escritorio | El `@media` de `responsive.css` y el `matchMedia` de `shell.js` no hablan del mismo ancho | Cambiar **los dos**. `referencia/trampas.md` 21 |
+| La cinta inferior del celular aparece pegada arriba, no al borde de la pantalla | Un ancestro tiene `backdrop-filter` y se vuelve el bloque contenedor del `fixed` | Apagarlo en móvil (ya lo hace `responsive.css` para `.topbar`). `referencia/trampas.md` 21 |
 | Una tarjeta se queda levantada después de tocarla en el celular | Un `:hover` fuera de `@media (hover: hover)` | `trampas.md` 22 |
 | La pantalla hace zoom sola al tocar un campo en iPhone | Campo por debajo de 16px en táctil | `trampas.md` 23 |
 | `npm run check` se queja de un color, un tamaño o una duración literal | Alguien escribió el valor a mano en un componente | Token en `tokens.css`. Es la regla 5, 14 o 15 |
