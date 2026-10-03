@@ -67,6 +67,7 @@ cuando el cliente cambia de idea (y entonces se anota en su hito).
 | Escribir las secciones | `.claude/skills/construir-secciones/SKILL.md` |
 | Dar la pasada de acabado antes de entregar | `.claude/skills/pulir-acabado/SKILL.md` |
 | Publicar en GitHub Pages | `.claude/skills/publicar-sitio/SKILL.md` |
+| Añadir un fondo animado o efecto de React Bits (¡licencia Commons Clause!) | `.claude/skills/fondos-react-bits/SKILL.md` |
 | Dejar memoria de lo hecho | `.claude/skills/registrar-hito/SKILL.md` |
 | Entender **por qué** el sitio está hecho así | `referencia/arquitectura.md` |
 | Qué hace que un sitio se lea como caro | `referencia/acabado.md` |
