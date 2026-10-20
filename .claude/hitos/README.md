@@ -22,6 +22,7 @@ repite el error.
 
 | # | Fecha | Título | Estado |
 |---|---|---|---|
+| [0008](0008-pr-se-construyen-antes-de-fusionar.md) | 2026-10-20 | Cada PR se construye antes de fusionarlo, y qué se excluyó de Dependabot | completado |
 | [0007](0007-dependabot-en-la-plantilla.md) | 2026-10-20 | Dependabot en la plantilla y en los proyectos | completado |
 | [0006](0006-cinta-inferior-movil-estandar.md) | 2026-09-30 | La cinta inferior del celular es el estándar | completado |
 | [0005](0005-tarjeta-al-compartir.md) | 2026-09-27 | La tarjeta al compartir es una captura del sitio | completado |
