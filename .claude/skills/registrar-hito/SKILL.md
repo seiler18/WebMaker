@@ -14,7 +14,7 @@ aquí. No se mezclan.
 | El cambio afecta a… | Va en |
 |---|---|
 | Un sitio concreto (su contenido, sus secciones, su deploy) | `<PROYECTO>/.claude/hitos/` |
-| La plantilla o las skills, o sea a **todos** los sitios futuros | `WebMaker/hitos/` |
+| La plantilla o las skills, o sea a **todos** los sitios futuros | `WebMaker/.claude/hitos/` |
 
 Es la distinción que hace que WebMaker mejore con el uso. Si al construir un
 sitio descubres que la plantilla tiene un defecto, el arreglo del sitio es

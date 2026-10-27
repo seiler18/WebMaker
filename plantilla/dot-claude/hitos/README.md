@@ -13,7 +13,7 @@ No se duplica información entre ellos. Para añadir un hito, ver la skill
 
 > Si un hito descubre un defecto de la **plantilla** (algo que le pasaría
 > igual al siguiente sitio), el arreglo de aquí es hito de este proyecto, y la
-> corrección de la plantilla es hito de `../WebMaker/hitos/`. Sin las dos
+> corrección de la plantilla es hito de `../WebMaker/.claude/hitos/`. Sin las dos
 > anotaciones, el siguiente proyecto repite el error.
 
 | # | Fecha | Título | Estado |
